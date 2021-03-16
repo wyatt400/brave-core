@@ -44,7 +44,7 @@ class SidebarItemsContentsView : public views::View,
   void EndDrag() override;
 
   // SidebarButtonView::Delegate overrides:
-  base::string16 GetTooltipTextFor(const views::View* view) const override;
+  std::u16string GetTooltipTextFor(const views::View* view) const override;
 
   // views::ContextMenuController overrides:
   void ShowContextMenuForViewImpl(views::View* source,
