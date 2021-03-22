@@ -1,8 +1,8 @@
 diff --git a/extensions/browser/sandboxed_unpacker.cc b/extensions/browser/sandboxed_unpacker.cc
-index 5b7be8bf71ac49f40f666bc2478573b3d9a9112d..f9c8e1c420cbe6cd2a9989d0fad21632fbc6992c 100644
+index 883d111eb54ce595307609096da56c3254118327..650a55962cc807ee5ea8a39b8eedb850a8e6bb8b 100644
 --- a/extensions/browser/sandboxed_unpacker.cc
 +++ b/extensions/browser/sandboxed_unpacker.cc
-@@ -991,6 +991,7 @@ base::Optional<base::Value> SandboxedUnpacker::RewriteManifestFile(
+@@ -996,6 +996,7 @@ base::Optional<base::Value> SandboxedUnpacker::RewriteManifestFile(
    DCHECK(!public_key_.empty());
    base::Value final_manifest = manifest.Clone();
    final_manifest.SetStringKey(manifest_keys::kPublicKey, public_key_);
