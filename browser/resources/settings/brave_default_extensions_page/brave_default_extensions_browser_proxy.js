@@ -67,10 +67,6 @@ cr.define('settings', function () {
     wasSignInEnabledAtStartup () {
       return loadTimeData.getBoolean('signInAllowedOnNextStartupInitialValue')
     }
-
-    isDecentralizedDnsEnabled () {
-      return cr.sendWithPromise('isDecentralizedDnsEnabled')
-    }
   }
 
   cr.addSingletonGetter(BraveDefaultExtensionsBrowserProxyImpl)

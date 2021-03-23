@@ -63,7 +63,6 @@
       <part file="speedreader_resources.grdp" />
       <part file="brave_flags_ui_resources.grdp" />
       <part file="ipfs_resources.grdp" />
-      <part file="decentralized_dns_resources.grdp" />
     </includes>
   </release>
 </grit>
