@@ -224,8 +224,8 @@ gfx::ImageSkia BraveDownloadItemView::GetLockIcon(int height) {
 }
 
 // Update accessible name with origin URL.
-void BraveDownloadItemView::SetMode(Mode mode) {
-  DownloadItemView::SetMode(mode);
+void BraveDownloadItemView::UpdateMode(Mode mode) {
+  DownloadItemView::UpdateMode(mode);
   if (IsShowingWarningDialog())
     return;
 

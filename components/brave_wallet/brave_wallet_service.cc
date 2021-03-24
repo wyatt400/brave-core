@@ -11,7 +11,6 @@
 #include "base/base64.h"
 #include "base/bind.h"
 #include "base/files/file_util.h"
-#include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/task/post_task.h"
 #include "base/task_runner_util.h"
@@ -33,8 +32,8 @@
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_system.h"
+#include "extensions/browser/shared_user_script_manager.h"
 #include "extensions/browser/unloaded_extension_reason.h"
-#include "extensions/browser/user_script_manager.h"
 #endif
 
 BraveWalletService::BraveWalletService(
@@ -83,8 +82,8 @@ std::string BraveWalletService::GetBitGoSeedFromRootSeed(
     const std::string& seed) {
   base::StringPiece salt("brave-bitgo-salt");
   base::StringPiece info("bitgo");
-  return crypto::HkdfSha256(base::MakeStringPiece(seed.begin(), seed.end()),
-                            salt, info, kSeedByteLength);
+  return crypto::HkdfSha256(base::StringPiece(seed.begin(), seed.end()), salt,
+                            info, kSeedByteLength);
 }
 
 // Returns 32 bytes of output from HKDF-SHA256.
@@ -98,8 +97,8 @@ std::string BraveWalletService::GetEthereumRemoteClientSeedFromRootSeed(
     const std::string& seed) {
   base::StringPiece salt("brave-ethwallet-salt");
   base::StringPiece info("ethwallet");
-  return crypto::HkdfSha256(base::MakeStringPiece(seed.begin(), seed.end()),
-                            salt, info, kSeedByteLength);
+  return crypto::HkdfSha256(base::StringPiece(seed.begin(), seed.end()), salt,
+                            info, kSeedByteLength);
 }
 
 // static
@@ -156,7 +155,7 @@ bool BraveWalletService::SealSeed(const std::string& seed,
                                   std::string* cipher_seed) {
   crypto::Aead aes_256_gcm_siv(crypto::Aead::AES_256_GCM_SIV);
   aes_256_gcm_siv.Init(&key);
-  return aes_256_gcm_siv.Seal(base::MakeStringPiece(seed.begin(), seed.end()),
+  return aes_256_gcm_siv.Seal(base::StringPiece(seed.begin(), seed.end()),
                               nonce, base::StringPiece(""), cipher_seed);
 }
 
@@ -171,9 +170,8 @@ void BraveWalletService::SaveToPrefs(PrefService* prefs,
   std::string base64_nonce;
   std::string base64_cipher_seed;
   base::Base64Encode(nonce, &base64_nonce);
-  base::Base64Encode(
-      base::MakeStringPiece(cipher_seed.begin(), cipher_seed.end()),
-      &base64_cipher_seed);
+  base::Base64Encode(base::StringPiece(cipher_seed.begin(), cipher_seed.end()),
+                     &base64_cipher_seed);
   prefs->SetString(kBraveWalletAES256GCMSivNonce, base64_nonce);
   prefs->SetString(kBraveWalletEncryptedSeed, base64_cipher_seed);
 }
@@ -263,14 +261,11 @@ std::string BraveWalletService::GetBitGoSeed(std::vector<uint8_t> key) {
 }
 
 void BraveWalletService::RemoveUnusedWeb3ProviderContentScripts() {
-// We don't use ExtensionRegistryObserver and simply access the private methods
-// OnExtensionLoaded()/OnExtensionUnloaded() from UserScriptLoader instead since
-// we only want to load/unload the content scripts and not the extension.
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   PrefService* prefs = user_prefs::UserPrefs::Get(context_);
-  auto* user_script_manager =
-      extensions::ExtensionSystem::Get(context_)->user_script_manager();
-  if (!user_script_manager) {
+  auto* shared_user_script_manager =
+      extensions::ExtensionSystem::Get(context_)->shared_user_script_manager();
+  if (!shared_user_script_manager) {
     return;
   }
   auto* registry = extensions::ExtensionRegistry::Get(context_);
@@ -280,13 +275,13 @@ void BraveWalletService::RemoveUnusedWeb3ProviderContentScripts() {
   auto* erc_extension = registry->enabled_extensions().GetByID(
       ethereum_remote_client_extension_id);
   if (erc_extension) {
-    user_script_manager->OnExtensionUnloaded(
+    shared_user_script_manager->OnExtensionUnloaded(
         context_, erc_extension, extensions::UnloadedExtensionReason::DISABLE);
   }
   auto* metamask_extension =
       registry->enabled_extensions().GetByID(metamask_extension_id);
   if (metamask_extension) {
-    user_script_manager->OnExtensionUnloaded(
+    shared_user_script_manager->OnExtensionUnloaded(
         context_, metamask_extension,
         extensions::UnloadedExtensionReason::DISABLE);
   }
@@ -299,11 +294,12 @@ void BraveWalletService::RemoveUnusedWeb3ProviderContentScripts() {
   // 2) Check if CryptoWallets content scripts are enabled, if so, disable them.
   if (provider == BraveWalletWeb3ProviderTypes::CRYPTO_WALLETS) {
     if (erc_extension) {
-      user_script_manager->OnExtensionLoaded(context_, erc_extension);
+      shared_user_script_manager->OnExtensionLoaded(context_, erc_extension);
     }
   } else if (provider != BraveWalletWeb3ProviderTypes::NONE) {
     if (metamask_extension) {
-      user_script_manager->OnExtensionLoaded(context_, metamask_extension);
+      shared_user_script_manager->OnExtensionLoaded(context_,
+                                                    metamask_extension);
     }
   }
 #endif

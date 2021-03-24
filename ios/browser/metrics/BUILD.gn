@@ -16,8 +16,9 @@ source_set("metrics") {
 
   deps = [
     "//base",
+    "//ios/chrome/browser/metrics",
     "//components/metrics",
     "//components/prefs",
-    "//ios/chrome/browser/metrics",
+    "//components/rappor",
   ]
 }

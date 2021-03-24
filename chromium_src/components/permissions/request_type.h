@@ -7,10 +7,9 @@
 #define BRAVE_CHROMIUM_SRC_COMPONENTS_PERMISSIONS_REQUEST_TYPE_H_
 
 #include "build/build_config.h"
-#include "third_party/widevine/cdm/buildflags.h"
 
 // clang-format off
-#if BUILDFLAG(ENABLE_WIDEVINE)
+#if !defined(OS_ANDROID) && !defined(OS_IOS)
 #define BRAVE_REQUEST_TYPES \
   kWidevine,
 #else

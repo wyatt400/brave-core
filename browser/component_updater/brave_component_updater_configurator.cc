@@ -57,7 +57,7 @@ BraveConfigurator::BraveConfigurator(
 
 BraveConfigurator::~BraveConfigurator() {}
 
-double BraveConfigurator::InitialDelay() const {
+int BraveConfigurator::InitialDelay() const {
   return configurator_impl_.InitialDelay();
 }
 

@@ -13,7 +13,6 @@
 #include "components/omnibox/browser/location_bar_model_impl.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/url_loader_interceptor.h"
-#include "mojo/public/cpp/system/data_pipe.h"
 #include "net/cert/ct_policy_status.h"
 #include "net/ssl/ssl_info.h"
 #include "net/test/cert_test_util.h"
@@ -70,11 +69,8 @@ class SecurityIndicatorTest
     resource_response->ssl_info = ssl_info;
     params->client->OnReceiveResponse(std::move(resource_response));
     // Send an empty response's body. This pipe is not filled with data.
-    mojo::ScopedDataPipeProducerHandle producer_handle;
-    mojo::ScopedDataPipeConsumerHandle consumer_handle;
-    mojo::CreateDataPipe(nullptr, producer_handle, consumer_handle);
-
-    params->client->OnStartLoadingResponseBody(std::move(consumer_handle));
+    mojo::DataPipe pipe;
+    params->client->OnStartLoadingResponseBody(std::move(pipe.consumer_handle));
     network::URLLoaderCompletionStatus completion_status;
     completion_status.ssl_info = ssl_info;
     params->client->OnComplete(completion_status);

@@ -9,7 +9,6 @@
 #include <memory>
 
 #include "base/process/process.h"
-#include "base/threading/thread.h"
 #include "brave/components/services/ipfs/public/mojom/ipfs_service.mojom.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/receiver.h"

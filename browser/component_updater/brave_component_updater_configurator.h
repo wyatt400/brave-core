@@ -33,7 +33,7 @@ class BraveConfigurator : public update_client::Configurator {
                     PrefService* pref_service);
 
   // update_client::Configurator overrides.
-  double InitialDelay() const override;
+  int InitialDelay() const override;
   int NextCheckDelay() const override;
   int OnDemandDelay() const override;
   int UpdateDelay() const override;

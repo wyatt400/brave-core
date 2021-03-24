@@ -1,5 +1,4 @@
 include_rules = [
-  "+components/breadcrumbs/core",
   "+crypto",
   "+ios/shared/chrome/common",
   "+ios/third_party",

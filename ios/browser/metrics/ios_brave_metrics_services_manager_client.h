@@ -27,6 +27,7 @@ class IOSBraveMetricsServicesManagerClient
 
  private:
   // metrics_services_manager::MetricsServicesManagerClient:
+  std::unique_ptr<rappor::RapporServiceImpl> CreateRapporServiceImpl() override;
   std::unique_ptr<metrics::MetricsServiceClient> CreateMetricsServiceClient()
       override;
   bool IsMetricsReportingEnabled() override;

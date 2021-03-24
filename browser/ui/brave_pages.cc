@@ -16,21 +16,22 @@
 namespace brave {
 
 void ShowBraveRewards(Browser* browser) {
-  NavigateParams params(
+  ShowSingletonTabOverwritingNTP(
+      browser,
       GetSingletonTabNavigateParams(browser, GURL(kBraveUIRewardsURL)));
-  ShowSingletonTabOverwritingNTP(browser, &params);
 }
 
 void ShowBraveAdblock(Browser* browser) {
-  NavigateParams params(
+  ShowSingletonTabOverwritingNTP(
+      browser,
       GetSingletonTabNavigateParams(browser, GURL(kBraveUIAdblockURL)));
-  ShowSingletonTabOverwritingNTP(browser, &params);
 }
 
 void ShowSync(Browser* browser) {
   auto url = chrome::GetSettingsUrl(chrome::kSyncSetupSubPage);
-  NavigateParams params(GetSingletonTabNavigateParams(browser, url));
-  ShowSingletonTabOverwritingNTP(browser, &params);
+  ShowSingletonTabOverwritingNTP(
+      browser,
+      GetSingletonTabNavigateParams(browser, url));
 }
 
 void ShowWebcompatReporter(Browser* browser) {
@@ -43,27 +44,26 @@ void ShowWebcompatReporter(Browser* browser) {
 }
 
 void ShowBraveWallet(Browser* browser) {
-  NavigateParams params(
+  ShowSingletonTabOverwritingNTP(
+      browser,
       GetSingletonTabNavigateParams(browser, GURL(kBraveUIWalletURL)));
-  ShowSingletonTabOverwritingNTP(browser, &params);
 }
 
 void ShowExtensionSettings(Browser* browser) {
-  NavigateParams params(
+  ShowSingletonTabOverwritingNTP(
+      browser,
       GetSingletonTabNavigateParams(browser, GURL(kExtensionSettingsURL)));
-  ShowSingletonTabOverwritingNTP(browser, &params);
 }
 
 void ShowWalletSettings(Browser* browser) {
-  NavigateParams params(
+  ShowSingletonTabOverwritingNTP(
+      browser,
       GetSingletonTabNavigateParams(browser, GURL(kWalletSettingsURL)));
-  ShowSingletonTabOverwritingNTP(browser, &params);
 }
 
 void ShowIPFS(Browser* browser) {
-  NavigateParams params(
-      GetSingletonTabNavigateParams(browser, GURL(kIPFSWebUIURL)));
-  ShowSingletonTabOverwritingNTP(browser, &params);
+  ShowSingletonTabOverwritingNTP(
+      browser, GetSingletonTabNavigateParams(browser, GURL(kIPFSWebUIURL)));
 }
 
 }  // namespace brave

@@ -15,8 +15,8 @@
 #include "chrome/browser/profiles/profile_window.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
-#include "chrome/browser/ui/profile_picker.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
+#include "chrome/browser/ui/user_manager.h"
 #include "chrome/common/pref_names.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/web_contents.h"
@@ -65,7 +65,8 @@ void NewTorConnectionForSite(Browser* browser) {
 }
 
 void AddNewProfile() {
-  ProfilePicker::Show(ProfilePicker::EntryPoint::kProfileMenuAddNewProfile);
+  UserManager::Show(/*profile_path_to_focus=*/base::FilePath(),
+                    profiles::USER_MANAGER_OPEN_CREATE_USER_PAGE);
 }
 
 void OpenGuestProfile() {

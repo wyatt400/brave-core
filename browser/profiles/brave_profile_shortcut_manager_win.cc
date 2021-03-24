@@ -30,7 +30,10 @@ void BraveProfileShortcutManagerWin::GetShortcutProperties(
   if (brave::IsSessionProfilePath(profile_path)) {
     ProfileAttributesStorage& storage =
         profile_manager_->GetProfileAttributesStorage();
-    if (!storage.GetProfileAttributesWithPath(profile_path))
+    ProfileAttributesEntry* entry;
+    bool has_entry =
+        storage.GetProfileAttributesWithPath(profile_path, &entry);
+    if (!has_entry)
       return;
   }
 

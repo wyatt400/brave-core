@@ -7,6 +7,7 @@
 
 #include "components/metrics/metrics_service_client.h"
 #include "components/prefs/pref_service.h"
+#include "components/rappor/rappor_service_impl.h"
 
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
@@ -18,6 +19,11 @@ IOSBraveMetricsServicesManagerClient::IOSBraveMetricsServicesManagerClient(
 
 IOSBraveMetricsServicesManagerClient::
     ~IOSBraveMetricsServicesManagerClient() = default;
+
+std::unique_ptr<rappor::RapporServiceImpl>
+IOSBraveMetricsServicesManagerClient::CreateRapporServiceImpl() {
+  return nullptr;
+}
 
 std::unique_ptr<metrics::MetricsServiceClient>
 IOSBraveMetricsServicesManagerClient::CreateMetricsServiceClient() {

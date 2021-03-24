@@ -20,6 +20,7 @@ import org.chromium.chrome.browser.compositor.layouts.OverviewModeBehavior;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.theme.ThemeColorProvider;
 import org.chromium.chrome.browser.theme.ThemeColorProvider.ThemeColorObserver;
+import org.chromium.components.browser_ui.widget.FeatureHighlightProvider;
 import org.chromium.components.feature_engagement.FeatureConstants;
 import org.chromium.components.feature_engagement.Tracker;
 
@@ -47,6 +48,8 @@ class BrowsingModeBottomToolbarMediator implements ThemeColorObserver {
     /** A provider that notifies components when the theme color changes.*/
     private ThemeColorProvider mThemeColorProvider;
 
+    private FeatureHighlightProvider mFeatureHighlightProvider;
+
     /**
      * Build a new mediator that handles events from outside the bottom toolbar.
      * @param model The {@link BrowsingModeBottomToolbarModel} that holds all the state for the
@@ -54,6 +57,7 @@ class BrowsingModeBottomToolbarMediator implements ThemeColorObserver {
      */
     BrowsingModeBottomToolbarMediator(BrowsingModeBottomToolbarModel model) {
         mModel = model;
+        mFeatureHighlightProvider = AppHooks.get().createFeatureHighlightProvider();
     }
 
     void setThemeColorProvider(ThemeColorProvider themeColorProvider) {

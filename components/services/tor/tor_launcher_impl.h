@@ -12,7 +12,6 @@
 
 #include "base/macros.h"
 #include "base/process/process.h"
-#include "base/threading/thread.h"
 #include "brave/components/services/tor/public/interfaces/tor.mojom.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/receiver.h"

@@ -8,16 +8,13 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <vector>
 
 #include "base/callback.h"
-#include "base/containers/flat_set.h"
 #include "base/mac/scoped_nsobject.h"
 #include "base/strings/sys_string_conversions.h"
+#include "chrome/browser/ui/cocoa/notifications/notification_constants_mac.h"
 #include "chrome/browser/ui/cocoa/notifications/notification_builder_mac.h"
-#include "chrome/services/mac_notifications/public/cpp/notification_constants_mac.h"
 
-// clang-format off
 @implementation BraveAlertDispatcherMac {
   base::scoped_nsobject<NSMutableArray> alerts_;
 }
@@ -32,8 +29,7 @@
 }
 
 - (void)closeNotificationWithId:(NSString *)notificationId
-                  profileId:(NSString *)profileId
-                  incognito:(BOOL)incognito {
+                  withProfileId:(NSString *)profileId {
   NSUserNotificationCenter * notificationCenter =
       [NSUserNotificationCenter defaultUserNotificationCenter];
   for (NSUserNotification * candidate in
@@ -52,26 +48,6 @@
   }
 }
 
-- (void)closeNotificationsWithProfileId:(NSString*)profileId
-                              incognito:(BOOL)incognito {
-  DCHECK(profileId);
-  NSUserNotificationCenter * notificationCenter =
-      [NSUserNotificationCenter defaultUserNotificationCenter];
-  for (NSUserNotification * candidate in
-       [notificationCenter deliveredNotifications]) {
-    NSString* candidateProfileId = [candidate.userInfo
-        objectForKey: notification_constants::kNotificationProfileId];
-
-    bool candidateIncognito = [[candidate.userInfo
-        objectForKey:notification_constants::kNotificationIncognito] boolValue];
-
-    if ([profileId isEqualToString: candidateProfileId] &&
-        incognito == candidateIncognito) {
-      [notificationCenter removeDeliveredNotification:candidate];
-    }
-  }
-}
-
 - (void)closeAllNotifications {
   [[NSUserNotificationCenter defaultUserNotificationCenter]
       removeAllDeliveredNotifications];
@@ -80,9 +56,8 @@
 - (void)
 getDisplayedAlertsForProfileId:(NSString *)profileId
                      incognito:(BOOL)incognito
+            notificationCenter:(NSUserNotificationCenter*)notificationCenter
                       callback:(GetDisplayedNotificationsCallback)callback {
-  NSUserNotificationCenter * notificationCenter =
-      [NSUserNotificationCenter defaultUserNotificationCenter];
   std::set<std::string> displayedNotifications;
   for (NSUserNotification * toast in
       [notificationCenter deliveredNotifications]) {
@@ -98,29 +73,4 @@ getDisplayedAlertsForProfileId:(NSString *)profileId
                           true /* supports_synchronization */);
 }
 
-- (void)getAllDisplayedAlertsWithCallback:
-    (GetAllDisplayedNotificationsCallback)callback {
-  NSUserNotificationCenter * notificationCenter =
-      [NSUserNotificationCenter defaultUserNotificationCenter];
-
-  std::vector<MacNotificationIdentifier> alertIds;
-  for (NSUserNotification * toast in
-      [notificationCenter deliveredNotifications]) {
-    std::string notificationId = base::SysNSStringToUTF8(
-        [toast.userInfo objectForKey:notification_constants::kNotificationId]);
-    std::string profileId = base::SysNSStringToUTF8([toast.userInfo
-         objectForKey:notification_constants::kNotificationProfileId]);
-    bool incognito = [[toast.userInfo
-        objectForKey:notification_constants::kNotificationIncognito] boolValue];
-
-    alertIds.push_back(
-        {std::move(notificationId), std::move(profileId), incognito});
-  }
-
-  // Create set from std::vector to avoid N^2 insertion runtime.
-  base::flat_set<MacNotificationIdentifier> alertSet(std::move(alertIds));
-  std::move(callback).Run(std::move(alertSet));
-}
-
 @end
-// clang-format on

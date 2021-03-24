@@ -10,10 +10,8 @@ namespace sandbox {
 namespace policy {
 namespace {
 
-void BraveLaunchOption(base::CommandLine* cmd_line,
-                       base::LaunchOptions* options) {
-  std::string process_type =
-      cmd_line->GetSwitchValueASCII(switches::kProcessType);
+void BraveLaunchOption(const std::string& process_type,
+                       base::LaunchOptions *options) {
   if (process_type == switches::kUtilityProcess)
     options->start_hidden = true;
 }
@@ -22,6 +20,6 @@ void BraveLaunchOption(base::CommandLine* cmd_line,
 }  // namespace policy
 }  // namespace sandbox
 
-#define BRAVE_START_SANDBOXED_PROCESS BraveLaunchOption(cmd_line, &options);
+#define BRAVE_START_SANDBOXED_PROCESS BraveLaunchOption(process_type, &options);
 #include "../../../../../sandbox/policy/win/sandbox_win.cc"
 #undef BRAVE_START_SANDBOXED_PROCESS

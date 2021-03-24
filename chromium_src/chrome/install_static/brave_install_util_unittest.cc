@@ -266,7 +266,7 @@ TEST(InstallStaticTest, SpacesAndQuotesWindowsInspired) {
 TEST(InstallStaticTest, BrowserProcessTest) {
   EXPECT_FALSE(IsProcessTypeInitialized());
   InitializeProcessType();
-  EXPECT_TRUE(IsBrowserProcess());
+  EXPECT_FALSE(IsNonBrowserProcess());
 }
 
 class InstallStaticUtilTest

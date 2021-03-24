@@ -220,6 +220,7 @@ bool BraveMainDelegate::BasicStartupComplete(int* exit_code) {
     features::kIdleDetection.name,
     features::kLangClientHintHeader.name,
     features::kNotificationTriggers.name,
+    features::kPrivacySettingsRedesign.name,
     features::kSignedExchangePrefetchCacheForNavigations.name,
     features::kSignedExchangeSubresourcePrefetch.name,
     features::kSubresourceWebBundles.name,
@@ -231,7 +232,6 @@ bool BraveMainDelegate::BasicStartupComplete(int* exit_code) {
 #if defined(OS_ANDROID)
     features::kWebNfc.name,
     feed::kInterestFeedContentSuggestions.name,
-    feed::kInterestFeedV2.name,
     offline_pages::kPrefetchingOfflinePagesFeature.name,
     translate::kTranslate.name,
 #endif
