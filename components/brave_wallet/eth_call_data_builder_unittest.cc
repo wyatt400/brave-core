@@ -21,4 +21,22 @@ TEST(EthCallDataBuilderTest, BalanceOf) {
 
 }  // namespace erc20
 
+namespace unstoppable_domains {
+
+TEST(EthCallDataBuilderTest, GetMany) {
+  std::string data;
+  std::vector<std::string> keys = {"crypto.ETH.address"};
+  EXPECT_TRUE(GetMany(keys, "brave.crypto", &data));
+  ASSERT_EQ(data,
+            "0x1bd8cc1a"
+            "0000000000000000000000000000000000000000000000000000000000000040"
+            "77252571a99feee8f5e6b2f0c8b705407d395adc00b3c8ebcc7c19b2ea850013"
+            "0000000000000000000000000000000000000000000000000000000000000001"
+            "0000000000000000000000000000000000000000000000000000000000000020"
+            "0000000000000000000000000000000000000000000000000000000000000012"
+            "63727970746f2e4554482e616464726573730000000000000000000000000000");
+}
+
+}  // namespace unstoppable_domains
+
 }  // namespace brave_wallet
