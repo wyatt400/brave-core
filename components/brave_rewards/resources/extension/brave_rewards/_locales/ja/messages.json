@@ -179,7 +179,7 @@
   },
   "expiresOn": {
     "message": "有効期限",
-    "description": "Used for grant representation. Whole string is '30.0 BAT expires on 08/05/2022'"
+    "description": "Used for grant representation. Whole string is '30.0 BAT expires on 08/05/2022'"
   },
   "recurringDonations": {
     "message": "毎月の支援額",
@@ -234,18 +234,6 @@
   "backupWalletNotification": {
     "message": "ウォレットをバックアップしてください。",
     "description": "Description for backup wallet notification"
-  },
-  "deviceLimitReachedLearnMore": {
-    "message": "詳しく知る",
-    "description": "Notification button text to learn more about device limit"
-  },
-  "deviceLimitReachedTitle": {
-    "message": "デバイスの上限に達しました",
-    "description": "Title for device limit reached notification"
-  },
-  "deviceLimitReachedNotification": {
-    "message": "　認証済みのデバイスの上限に達したため、あなたのウォレットを確認できません。",
-    "description": "Description for device limit reached notification"
   },
   "insufficientFundsNotification": {
     "message": "Brave Rewardsアカウントは入金を待っています。",
@@ -420,7 +408,7 @@
     "description": "Terms of service panel opt-in text"
   },
   "bat": {
-    "message": "BAP",
+    "message": "BAT",
     "description": "BAT text for displaying converted tip amount."
   },
   "bap": {
@@ -520,16 +508,16 @@
     "description": "CTA status button"
   },
   "walletButtonUnverified":  {
-    "message": "ウォレットを認証",
+    "message": "ウォレットを確認",
     "description": "CTA to verify wallet in the wallet "
   },
   "walletButtonVerified":  {
-    "message": "ウォレットが認証済み",
+    "message": "ウォレットが検証済み",
     "description": "Displayed in wallet that tells users that he is verified"
   },
   "walletGoToProvider":  {
-    "message": "私の$provider$アカウントに移動する",
-    "description": "CTA to open an external wallet account",
+    "message": "$provider$のアカウントに移動",
+    "description": "CTA to open uphold account",
     "placeholders": {
       "provider": {
         "content": "$1",
@@ -538,19 +526,19 @@
     }
   },
   "walletDisconnect":  {
-    "message": "Brave Rewardとの接続を解除する",
+    "message": "Braveの報酬から切断",
     "description": "CTA to disconnect user wallet from rewards"
   },
   "walletVerified":  {
-    "message": "認証済み",
+    "message": "確認済み",
     "description": "Status button that tells user that he is verified"
   },
   "walletVerifiedNotification":  {
-    "message": "ウォレットの認証が完了しました！",
+    "message": "ウォレットの確認が完了しました！",
     "description": "Title for notification when wallet becomes verified"
   },
   "walletVerifiedTextNotification":  {
-    "message": "おめでとうございます！お使いの$name$ウォレットの認証が無事完了し、資金の追加と引き出しの準備が整いました。",
+    "message": "おめでとうございます！お使いの$name$ウォレットの確認が無事完了し、資金の追加と引き出しの準備が整いました。",
     "description": "Title for notification when wallet becomes verified",
     "placeholders": {
       "name": {
@@ -572,7 +560,7 @@
     "description": "Text shown for connected publishers that are not fully verified in the panel"
   },
   "walletGoToVerifyPage":  {
-    "message": "ウォレットの認証を完了",
+    "message": "ウォレットの検証を完了",
     "description": "CTA for completing wallet verification"
   },
   "set": {
@@ -642,8 +630,8 @@
     "description": "Status button that tells user that he is currently pending"
   },
   "walletVerificationNote3":  {
-    "message": "注意： 承認すると、あなたのトランザクションは$provider$から閲覧可能になります。。例えば、彼らはチップの受取人と金額を見ることができるようになります。",
-    "description": "Displayed in login modal for external wallet providers",
+    "message": "ご注意：承認するとトランザクションは「$provider$ 」に表示されます。 たとえば、受信者とチップの金額を確認できます。",
+    "description": "Displayed in login modal for uphold",
     "placeholders": {
       "provider": {
         "content": "$1",
@@ -790,7 +778,7 @@
     "description": ""
   },
   "bapDeprecationHeader": {
-    "message": "日本の「Brave Rewards」は新しいシステムに移行を予定しています！",
+    "message": "日本でのBrave Rewardsが新システムに移行します！",
     "description": "Header text for BAP deprecation warning message"
   },
   "bapDeprecationLearnMore": {
