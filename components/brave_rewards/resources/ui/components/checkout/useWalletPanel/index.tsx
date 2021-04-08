@@ -48,7 +48,7 @@ interface UseWalletPanelProps {
   hasSufficientFunds: boolean
   rewardsEnabled: boolean
   walletVerified: boolean
-  onShowAddFunds: () => void
+  onShowAddFunds?: () => void
   onPayWithWallet: () => void
 }
 

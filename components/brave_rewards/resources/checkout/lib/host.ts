@@ -50,11 +50,11 @@ export function createHost (): Host {
     }
   }
 
-  function sendRateInfo() {
+  function sendRateInfo () {
     if (hostListener && rateDetails) {
       const rate = rateDetails.rate
       const lastUpdated = new Date(Number(rateDetails.lastUpdated)).toISOString()
-      hostListener.onRatesUpdated({rate, lastUpdated})
+      hostListener.onRatesUpdated({ rate, lastUpdated })
     }
   }
 

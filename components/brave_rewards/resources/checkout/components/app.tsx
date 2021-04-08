@@ -54,7 +54,7 @@ export function App (props: AppProps) {
   }
 
   const payWithWallet = () => {
-    props.host.payWithWallet();
+    props.host.payWithWallet()
     setFlowState('payment-processing')
   }
 
@@ -113,18 +113,18 @@ export function App (props: AppProps) {
             walletLastUpdated={formatLastUpdatedDate(rateInfo.lastUpdated)}
             walletVerified={walletInfo.verified}
             hasSufficientFunds={amountNeeded <= 0}
-            onPayWithCreditCard={() => {}}
             onPayWithWallet={payWithWallet}
-            onShowAddFunds={() => {}}
           /> :
         flowState === 'payment-processing' ?
           <PaymentProcessing
             paymentDone={paymentDone}
           /> :
-        flowState === 'payment-complete' ?
-          <PaymentComplete
-            onClose={onClose}
-            reason={DialogCloseReason.Complete}/> : ''
+          flowState === 'payment-complete' ?
+            <PaymentComplete
+              onClose={onClose}
+              reason={DialogCloseReason.Complete}
+            /> :
+            ''
       }
     </DialogFrame>
   )

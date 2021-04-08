@@ -28,7 +28,7 @@ export interface DialogFrameProps {
 
 export function DialogFrame (props: DialogFrameProps) {
   const locale = React.useContext(LocaleContext)
-  
+
   const onClose = () => {
     props.onClose(props.reason)
   }

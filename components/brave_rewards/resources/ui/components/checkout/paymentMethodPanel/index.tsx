@@ -21,9 +21,9 @@ interface PaymentMethodPanelProps {
   walletBalanceConverted: string
   walletVerified: boolean
   walletLastUpdated: string
-  onPayWithCreditCard: (cardDetails: CreditCardDetails) => void
+  onPayWithCreditCard?: (cardDetails: CreditCardDetails) => void
   onPayWithWallet: () => void
-  onShowAddFunds: () => void
+  onShowAddFunds?: () => void
 }
 
 export function PaymentMethodPanel (props: PaymentMethodPanelProps) {

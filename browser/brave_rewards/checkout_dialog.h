@@ -85,7 +85,6 @@ class CheckoutDialogHandler : public content::WebUIMessageHandler {
                                  ledger::type::ExternalWalletPtr wallet);
   void GetRewardsParametersCallback(
       ledger::type::RewardsParametersPtr parameters);
-  void OnSKUProcessed(const ledger::type::Result, const std::string& value);
 
   RewardsService* rewards_service_ = nullptr;  // NOT OWNED
 
@@ -96,8 +95,7 @@ class CheckoutDialogHandler : public content::WebUIMessageHandler {
   DISALLOW_COPY_AND_ASSIGN(CheckoutDialogHandler);
 };
 
-void ShowCheckoutDialog(content::WebContents* initiator,
-                        base::WeakPtr<payments::PaymentRequest> request);
+void ShowCheckoutDialog(base::WeakPtr<payments::PaymentRequest> request);
 
 }  // namespace brave_rewards
 

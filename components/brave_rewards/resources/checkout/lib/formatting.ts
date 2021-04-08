@@ -26,7 +26,7 @@ export function createExchangeFormatter (
 ) {
   const formatter = createCurrencyFormatter(currency)
   const rate = exchangeRate
- 
+
   return (value: number) => formatter.format(value * rate)
 }
 

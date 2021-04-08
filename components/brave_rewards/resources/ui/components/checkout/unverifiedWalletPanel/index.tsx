@@ -14,7 +14,7 @@ import {
   UnverifiedWalletMessage,
   UnverifiedWalletTitle,
   StyledImage,
-  StyledNoticeLink,
+  StyledNoticeLink
 } from './style'
 
 import walletIconUrl from './assets/graphic-wallet.svg'
@@ -24,9 +24,9 @@ export function UnverifiedWalletPanel () {
 
   return (
     <>
-      <UnverifiedWalletTitle><DefaultEmoteSadIcon />  {locale.get('unverifiedWalletTitle')}</UnverifiedWalletTitle>
+      <UnverifiedWalletTitle><DefaultEmoteSadIcon /> {locale.get('unverifiedWalletTitle')}</UnverifiedWalletTitle>
       <UnverifiedWalletMessage>{locale.get('unverifiedWalletMessage')}</UnverifiedWalletMessage>
-      <LineSeparator /> 
+      <LineSeparator />
       <ConnectWallet>{locale.get('connectWalletPrefix')}<StyledNoticeLink href={'chrome://rewards/#verify'} target={'_blank'}> {locale.get('connectWalletSuffix')}</StyledNoticeLink></ConnectWallet>
       <StyledImage src={walletIconUrl} />
     </>

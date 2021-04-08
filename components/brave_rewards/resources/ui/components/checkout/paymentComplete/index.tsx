@@ -18,8 +18,8 @@ export function PaymentComplete (props: PaymentCompleteProps) {
   const locale = React.useContext(LocaleContext)
   const TIMEOUT_SECONDS = 1
 
-  window.setTimeout(function() {
-    props.onClose(props.reason);
+  window.setTimeout(function () {
+    props.onClose(props.reason)
   }, TIMEOUT_SECONDS * 1000)
 
   return (
