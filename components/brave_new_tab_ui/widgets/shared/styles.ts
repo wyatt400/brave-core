@@ -126,6 +126,10 @@ export const Text = styled('p')<StyleProps>`
   ${getBoxStyle}
 `
 
+export const LightText = styled(Text)`
+  color: #bbb;
+`
+
 export const BasicBox = styled('div')<StyleProps>`
   display: ${p => (p.isFlex ? 'flex' : 'block')};
   ${(p) =>
@@ -268,7 +272,6 @@ export const ActionButton = styled('button')<StyleProps>`
   cursor: pointer;
   color: #ffffff;
   line-height: 1;
-  text-transform: uppercase;
 
   ${getBoxStyle}
 `

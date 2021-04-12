@@ -43,12 +43,19 @@ const char get_market_data_path[] = "/api/markets";
 const char oauth_path[] = "/oauth";
 const char oauth_token_path[] = "/api/oauth/token";
 const char oauth_balances_path[] = "/api/wallet/balances";
-const char oauth_quote_path[] = "/otc/quotes";
+const char oauth_quote_path[] = "/api/otc/quotes";
 const char futures_filter[] = "perpetual";
 
-typedef std::vector<std::map<std::string, std::string>> FTXChartData;
-typedef std::vector<std::map<std::string, std::string>> FTXFuturesData;
-typedef std::map<std::string, std::string> FTXAccountBalances;
+struct TokenPriceData {
+  std::string symbol;
+  double price;
+  double percentChangeDay;
+  double volumeDay;
+};
+
+typedef std::vector<std::map<std::string, double>> FTXChartData;
+typedef std::vector<TokenPriceData> FTXFuturesData;
+typedef std::map<std::string, double> FTXAccountBalances;
 
 class FTXService : public KeyedService {
  public:

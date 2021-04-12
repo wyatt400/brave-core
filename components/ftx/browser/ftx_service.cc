@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "base/base64.h"
+#include "base/json/json_writer.h"
 #include "base/task/post_task.h"
 #include "base/task_runner_util.h"
 #include "brave/components/ftx/browser/ftx_json_parser.h"
@@ -67,7 +68,20 @@ FTXService::FTXService(content::BrowserContext* context)
       url_loader_factory_(
           content::BrowserContext::GetDefaultStoragePartition(context_)
               ->GetURLLoaderFactoryForBrowserProcess()),
-      weak_factory_(this) {}
+      weak_factory_(this) {
+  PrefService* prefs = user_prefs::UserPrefs::Get(context);
+  // Get access token from prefs
+  std::string encoded_encrypted_access_token =
+      prefs->GetString(kFTXAccessToken);
+  std::string encrypted_access_token;
+  if (!base::Base64Decode(encoded_encrypted_access_token,
+                          &encrypted_access_token)) {
+    LOG(ERROR) << "FTX: Could not decode Token info from prefs";
+  } else {
+    if (!OSCrypt::DecryptString(encrypted_access_token, &access_token_)) {
+      LOG(ERROR) << "Could not decrypt and save Gemini access token";
+    }
+  }
 
 FTXService::~FTXService() {}
 
@@ -100,8 +114,12 @@ bool FTXService::GetChartData(const std::string& symbol,
       api_host, std::string(get_market_data_path) + "/" + symbol + "/candles");
   url = net::AppendQueryParameter(url, "resolution", "14400");
   url = net::AppendQueryParameter(url, "limit", "42");
-  url = net::AppendQueryParameter(url, "start_time", start);
-  url = net::AppendQueryParameter(url, "end_time", end);
+  if (!start.empty()) {
+    url = net::AppendQueryParameter(url, "start_time", start);
+  }
+  if (!end.empty()) {
+    url = net::AppendQueryParameter(url, "end_time", end);
+  }
   return NetworkRequest(url, "GET", "", std::move(internal_callback), false);
 }
 
@@ -168,12 +186,16 @@ bool FTXService::GetAccessToken(GetAccessTokenCallback callback) {
       base::BindOnce(&FTXService::OnGetAccessToken, base::Unretained(this),
                      std::move(callback));
   GURL url = GetOAuthURL(oauth_token_path);
-  url = net::AppendQueryParameter(url, "grant_type", "code");
-  url = net::AppendQueryParameter(url, "redirect_uri", oauth_callback);
-  url = net::AppendQueryParameter(url, "code", auth_token_);
-  auth_token_.clear();
-  access_token_.clear();
-  return NetworkRequest(url, "POST", url.query(), std::move(internal_callback),
+  base::Value request_data(base::Value::Type::DICTIONARY);
+  request_data.SetStringKey("grant_type", "code");
+  request_data.SetStringKey("redirect_uri", oauth_callback);
+  request_data.SetStringKey("code", auth_token_);
+  std::string body;
+  if (!base::JSONWriter::Write(request_data, &body)) {
+    std::move(callback).Run(false);
+    return false;
+  }
+  return NetworkRequest(url, "POST", body, std::move(internal_callback),
                         true);
 }
 
@@ -202,10 +224,17 @@ bool FTXService::GetConvertQuote(
   auto internal_callback = base::BindOnce(&FTXService::OnGetConvertQuote,
       base::Unretained(this), std::move(callback));
   GURL url = GetOAuthURL(oauth_quote_path);
-  url = net::AppendQueryParameter(url, "fromCoin", from);
-  url = net::AppendQueryParameter(url, "toCoin", to);
-  url = net::AppendQueryParameter(url, "size", amount);
-  return NetworkRequest(url, "POST", url.query(), std::move(internal_callback),
+  base::Value request_data(base::Value::Type::DICTIONARY);
+  request_data.SetStringKey("fromCoin", from);
+  request_data.SetStringKey("toCoin", to);
+  request_data.SetStringKey("size", amount);
+  std::string body;
+  if (!base::JSONWriter::Write(request_data, &body)) {
+    LOG(ERROR) << "FTX: Could not serialize convert quote body data!";
+    std::move(callback).Run("");
+    return false;
+  }
+  return NetworkRequest(url, "POST", body, std::move(internal_callback),
                         true);
 }
 
@@ -300,7 +329,7 @@ bool FTXService::NetworkRequest(const GURL& url,
       std::move(request), GetNetworkTrafficAnnotationTag());
   if (!post_data.empty()) {
     url_loader->AttachStringForUpload(post_data,
-                                      "application/x-www-form-urlencoded");
+                                      "application/json");
   }
   url_loader->SetRetryOptions(
       kRetriesCountOnNetworkChange,

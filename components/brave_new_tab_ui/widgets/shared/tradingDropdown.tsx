@@ -9,8 +9,6 @@ import {
   InputWrapper,
   AmountInputField,
   Dropdown,
-  ActionsWrapper,
-  ActionButton,
   AssetDropdownLabel,
   AssetItems,
   AssetItem,
@@ -19,7 +17,7 @@ import {
   BasicBox
 } from './styles'
 import { CaratDownIcon } from 'brave-ui/components/icons'
-import icons from '../shared/assets/icons'
+import icons from './assets/icons'
 
 const renderIconAsset = (key: string) => {
   if (!(key in icons)) {
@@ -34,17 +32,26 @@ const renderIconAsset = (key: string) => {
 }
 
 interface Props {
-  assets: Array<string>
+  fromAssets: string[]
+  toAssets: string[]
+  onChange: (from: string, to: string, quantity: number) => unknown
 }
 
 export const TradingDropdown = ({
-  assets
+  fromAssets,
+  toAssets,
+  onChange
 }: Props) => {
   const [fromDropdownShowing, setFromDropdown] = React.useState(false)
   const [toDropdownShowing, setToDropdown] = React.useState(false)
-  const [currentQuantity, setCurrentQuantity] = React.useState('')
-  const [fromAsset, setFromAsset] = React.useState('BTC')
-  const [toAsset, setToAsset] = React.useState('BAT')
+  const [currentQuantity, setCurrentQuantity] = React.useState<number>()
+  const [fromAsset, setFromAsset] = React.useState(fromAssets.length ? fromAssets[0] : '')
+
+  const toAssetsFiltered = React.useMemo(() => {
+    return toAssets.filter(name => name !== fromAsset)
+  }, [toAssets, fromAsset])
+
+  const [toAsset, setToAsset] = React.useState(toAssetsFiltered.length ? toAssetsFiltered[0] : '')
 
   const toggleDropDowns = (dropdown: string) => {
     if (dropdown === 'to') {
@@ -66,8 +73,12 @@ export const TradingDropdown = ({
 
   const handleChange = ({ target }: any) => {
     const { value } = target
-    setCurrentQuantity(value)
+    setCurrentQuantity(Number(value))
   }
+
+  React.useEffect(() => {
+    onChange(fromAsset, toAsset, currentQuantity || 0)
+  }, [fromAsset, toAsset, currentQuantity, onChange])
 
   return (
     <>
@@ -93,7 +104,7 @@ export const TradingDropdown = ({
           {
             fromDropdownShowing
               ? <AssetItems>
-                {assets.filter(v => v !== fromAsset).map((asset: string, i: number, filteredAssets: string[]) => {
+                {fromAssets.filter(v => v !== fromAsset).map((asset: string, i: number, filteredAssets: string[]) => {
                   return (
                     <AssetItem
                       key={`choice-${asset}`}
@@ -133,7 +144,7 @@ export const TradingDropdown = ({
           {
             toDropdownShowing
               ? <AssetItems>
-                {assets.filter(v => v !== toAsset).map((asset: string, i: number, filteredAssets: string[]) => {
+                {toAssetsFiltered.filter(v => v !== toAsset).map((asset: string, i: number, filteredAssets: string[]) => {
                   return (
                     <AssetItem
                       key={`choice-${asset}`}
@@ -152,11 +163,6 @@ export const TradingDropdown = ({
           }
         </InputWrapper>
       </TradeWrapper>
-      <ActionsWrapper>
-        <ActionButton>
-          Preview Conversion
-        </ActionButton>
-      </ActionsWrapper>
     </>
   )
 }

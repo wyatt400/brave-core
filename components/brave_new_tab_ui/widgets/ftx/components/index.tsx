@@ -4,10 +4,10 @@
 import * as React from 'react'
 import { ThemeProvider, ThemeConsumer } from 'styled-components'
 
-import createWidget from '../../default/widget/index'
-import { StyledTitleTab } from '../../default/widgetTitleTab'
+import createWidget from '../../../components/default/widget/index'
+import { StyledTitleTab } from '../../../components/default/widgetTitleTab'
 
-import { currencyNames } from '../shared/data'
+import { currencyNames } from '../../shared/data'
 
 import {
   ActionAnchor,
@@ -31,34 +31,30 @@ import {
   PlainAnchor,
   Balance,
   BlurIcon
-} from '../shared/styles'
-import { Chart, TradingDropdown } from '../shared'
+} from '../../shared/styles'
+import { Chart } from '../../shared'
 import { CaratLeftIcon } from 'brave-ui/components/icons'
 import {
   ShowIcon,
   HideIcon
-} from '../../default/exchangeWidget/shared-assets'
-import icons from '../shared/assets/icons'
+} from '../../../components/default/exchangeWidget/shared-assets'
+import icons from '../../shared/assets/icons'
+import * as FTXActions from '../ftx_actions'
+import { FTXState, ViewType } from '../ftx_state'
 import ftxLogo from './ftx-logo.png'
 import customizeTheme from './theme'
+import Convert from './convert'
 
 // Utils
-
-enum Views {
-  markets = 'markets',
-  convert = 'convert',
-  summary = 'summary'
-}
 interface State {
-  currentView: Views
-  selectedAsset: string
   hideBalance: boolean
 }
 
 interface Props {
+  ftx: FTXState
+  actions: typeof FTXActions
   widgetTitle: string
   showContent: boolean
-  optedIntoMarkets: boolean
   stackPosition: number
   onShowContent: () => void
   onInteraction: () => void
@@ -67,22 +63,17 @@ interface Props {
 
 class FTX extends React.PureComponent<Props, State> {
   private refreshInterval: any
-  private topMovers: string[] = Object.keys(currencyNames)
 
   constructor (props: Props) {
     super(props)
     this.state = {
-      currentView: Views.markets,
-      selectedAsset: '',
       hideBalance: true
     }
   }
 
   componentDidMount () {
-    const { optedIntoMarkets } = this.props
-
-    if (optedIntoMarkets) {
-      this.checkSetRefreshInterval()
+    if (!this.props.ftx.hasInitialized) {
+      this.props.actions.initialize()
     }
   }
 
@@ -103,30 +94,17 @@ class FTX extends React.PureComponent<Props, State> {
     this.refreshInterval = null
   }
 
-  setSelectedAsset = (asset: string) => {
-    this.setState({
-      selectedAsset: asset
-    })
-  }
-
   handleViewMarketsClick = async () => {
     this.props.onInteraction()
     this.optInMarkets(true)
   }
 
   optInMarkets = (show: boolean) => {
-    if (show) {
-      this.checkSetRefreshInterval()
-    } else {
-      this.setState({ selectedAsset: '' })
-    }
-
-    this.props.onOptInMarkets(show)
+    this.props.actions.openView(show ? ViewType.Markets : ViewType.OptIn)
   }
 
-  handleAssetDetailClick = async (asset: string) => {
-    this.setSelectedAsset(asset)
-  //  await this.props.onSetAssetData([asset])
+  handleAssetDetailClick = async (symbol: string) => {
+    this.props.actions.showAssetDetail({ symbol })
   }
 
   formattedNum = (price: number) => {
@@ -173,13 +151,18 @@ class FTX extends React.PureComponent<Props, State> {
   }
 
   renderAssetDetailView () {
-    const { selectedAsset: currency } = this.state
-    const { price = null, volume = null } = null || { price: 1000, volume: 9999 }
-    const chartData = null || []
-
-    const losersGainers = {}
-    const { percentChange = null } = losersGainers[currency] || {}
-
+    const assetDetail = this.props.ftx.assetDetail
+    // Sanity check
+    if (!assetDetail) {
+      return null
+    }
+    const currency = assetDetail.currencyName
+    const price = assetDetail.marketData?.price
+    const volume = assetDetail.marketData?.volumeDay
+    const percentChange = assetDetail.marketData?.percentChangeDay
+    const chartData = assetDetail.chartData
+    const chartDataError = chartData && typeof chartData === 'string'
+    const waitingForChartData = !chartData
     const chartHeight = 100
     const chartWidth = 309
     return (
@@ -192,7 +175,7 @@ class FTX extends React.PureComponent<Props, State> {
         >
           <FlexItem>
             <BackArrow>
-              <CaratLeftIcon onClick={this.setSelectedAsset.bind(this, '')} />
+              <CaratLeftIcon onClick={this.props.actions.hideAssetDetail} />
             </BackArrow>
           </FlexItem>
           <FlexItem $pr={5}>
@@ -217,7 +200,7 @@ class FTX extends React.PureComponent<Props, State> {
           isFullWidth={true}
           hasBorder={true}
         >
-          {(price !== null) && <Text
+          {(price) && <Text
             inline={true}
             large={true}
             weight={500}
@@ -225,8 +208,15 @@ class FTX extends React.PureComponent<Props, State> {
           >
             {this.formattedNum(price)} USDT
           </Text>}
-          {(percentChange !== null) && <Text inline={true} textColor={percentChange > 0 ? 'green' : 'red'}>{percentChange}%</Text>}
+          {(percentChange) && <Text inline={true} textColor={percentChange > 0 ? 'green' : 'red'}>{percentChange}%</Text>}
+          {chartData && typeof chartData !== 'string' &&
           <Chart width={chartWidth} height={chartHeight} data={chartData} />
+          }
+          {waitingForChartData &&
+          <Text>Loading...</Text>
+          }
+          {chartDataError &&
+          <Text>Error fetching data.</Text>}
         <Text small={true} textColor='xlight'>
           {'ftxWidgetGraph'}
         </Text>
@@ -262,22 +252,26 @@ class FTX extends React.PureComponent<Props, State> {
         <FilterOption>Special</FilterOption>
       </Filters>
       <List>
-        {this.topMovers.map(currency => {
-          const { price = null } = null || { price: 1000 }
-          const losersGainers = {}
-          const { percentChange = null } = losersGainers[currency] || {}
+        {this.props.ftx.marketData.map(market => {
+          const { symbol, price, percentChangeDay } = market
+          const currencyName = currencyNames[symbol]
+          // const { price = null } = null || { price: 1000 }
+          // const losersGainers = {}
+          // const { percentChange = null } = losersGainers[currency] || {}
           return (
-            <ListItem key={currency} isFlex={true} onClick={this.handleAssetDetailClick.bind(this, currency)} $height={48}>
+            <ListItem key={symbol} isFlex={true} onClick={this.handleAssetDetailClick.bind(this, symbol)} $height={48}>
               <FlexItem $pl={5} $pr={5}>
-                {this.renderIconAsset(currency.toLowerCase())}
+                {this.renderIconAsset(symbol.toLowerCase())}
               </FlexItem>
               <FlexItem>
-                <Text>{currency}</Text>
-                <Text small={true} textColor='light'>{currencyNames[currency]}</Text>
+                <Text>{symbol}</Text>
+                {currencyName &&
+                <Text small={true} textColor='light'>{currencyNames[symbol]}</Text>
+                }
               </FlexItem>
               <FlexItem textAlign='right' flex={1}>
                 {(price !== null) && <Text>{this.formattedNum(price)}</Text>}
-                {(percentChange !== null) && <Text textColor={percentChange > 0 ? 'green' : 'red'}>{percentChange}%</Text>}
+                {(percentChangeDay !== null) && <Text textColor={percentChangeDay > 0 ? 'green' : 'red'}>{percentChangeDay}%</Text>}
               </FlexItem>
             </ListItem>
           )
@@ -297,19 +291,19 @@ class FTX extends React.PureComponent<Props, State> {
   renderSummary () {
     const { hideBalance } = this.state
 
-    const quantity = 140.0123434
-    const estimate = quantity * 4.02
-    const currency = 'BTC'
+    const total = this.props.ftx.balanceTotal
 
     return (
       <Box $mt={10}>
+
         <FlexItem isFlex={true} $p={15} hasPadding={true} >
+          {total !== null &&
           <FlexItem>
             <Balance hideBalance={hideBalance}>
-              <Text lineHeight={1.15} $fontSize={21}>{quantity}<Text inline={true}>{currency}</Text></Text>
-              <Text lineHeight={1.2} textColor='light'>≈ {this.formattedNum(estimate)}</Text>
+              <Text lineHeight={1.15} $fontSize={21}>{this.formattedNum(total)}</Text>
             </Balance>
           </FlexItem>
+          }
           <FlexItem>
             <BlurIcon onClick={this.toggleBalanceVisibility}>
               {
@@ -321,19 +315,20 @@ class FTX extends React.PureComponent<Props, State> {
           </FlexItem>
         </FlexItem>
         <List hasBorder={false}>
-          {this.topMovers.map(currency => {
+          {Object.keys(this.props.ftx.balances).map(currencyKey => {
+            const balance = this.props.ftx.balances[currencyKey]
             return (
-              <ListItem key={currency} isFlex={true} $height={40}>
+              <ListItem key={currencyKey} isFlex={true} $height={40}>
                 <FlexItem $pl={5} $pr={5}>
-                  {this.renderIconAsset(currency.toLowerCase(), 18)}
+                  {this.renderIconAsset(currencyKey.toLowerCase(), 18)}
                 </FlexItem>
                 <FlexItem>
-                  <Text>{currency}</Text>
+                  <Text>{currencyKey}</Text>
                 </FlexItem>
                 <FlexItem textAlign='right' flex={1}>
                   <Balance hideBalance={hideBalance}>
-                    {(quantity !== null) && <Text lineHeight={1.15}>{quantity}</Text>}
-                    {(estimate !== null) && <Text textColor='light' small={true} lineHeight={1.15}>≈ {this.formattedNum(estimate)}</Text>}
+                    {(balance !== null) && <Text lineHeight={1.15}>{balance}</Text>}
+                    {/* {(estimate !== null) && <Text textColor='light' small={true} lineHeight={1.15}>≈ {this.formattedNum(estimate)}</Text>} */}
                   </Balance>
                 </FlexItem>
               </ListItem>
@@ -344,74 +339,43 @@ class FTX extends React.PureComponent<Props, State> {
     )
   }
 
-  renderConvert () {
-    const { availableAmount, availableLabel } = {
-      availableAmount: 3.754,
-      availableLabel: 'BTC'
-    }
-
-    return (
-      <>
-        <BasicBox isFlex={true} $mt={25}>
-          <Text>
-            Convert
-          </Text>
-          <Text small={true}>
-            {`Available ${availableAmount} ${availableLabel}`}
-          </Text>
-        </BasicBox>
-        <TradingDropdown
-          assets={['BTC', 'ETH', 'BAT']}
-        />
-        <PlainButton
-          textAlign='center'
-          weight='600'
-          textColor='light'
-          isFullWidth={true}
-          $mt={10}
-        >
-          Cancel
-        </PlainButton>
-      </>
-    )
-  }
-
   renderView () {
-    const { currentView, selectedAsset } = this.state
-
+    const selectedAsset = this.props.ftx.assetDetail?.currencyName
+    const { currentView } = this.props.ftx
     if (selectedAsset) {
       return this.renderAssetDetailView()
-    } else if (currentView === Views.convert) {
-      return this.renderConvert()
-    } else if (currentView === Views.summary) {
+    } else if (currentView === ViewType.Convert) {
+      return <Convert ftx={this.props.ftx} actions={this.props.actions} />
+    } else if (currentView === ViewType.Summary) {
       return this.renderSummary()
     } else {
       return this.renderMarkets()
     }
   }
 
-  setView = (view: Views) => {
-    this.setState({
-      currentView: view
-    })
+  setView = (view: ViewType) => {
+    this.props.actions.openView(view)
   }
 
   renderIndex () {
-    const { currentView } = this.state
+    const { currentView } = this.props.ftx
     return <>
       <BasicBox isFlex={true} justify="start">
-        <PlainButton $pl="0" weight={600} textColor={currentView === Views.markets ? 'white' : 'light'} onClick={this.setView.bind(null, Views.markets)}>Markets</PlainButton>
-        <PlainButton weight={600} textColor={currentView === Views.convert ? 'white' : 'light'} onClick={this.setView.bind(null, Views.convert)}>Convert</PlainButton>
-        <PlainButton weight={600} textColor={currentView === Views.summary ? 'white' : 'light'} onClick={this.setView.bind(null, Views.summary)}>Summary</PlainButton>
+        <PlainButton $pl="0" weight={600} textColor={currentView === ViewType.Markets ? 'white' : 'light'} onClick={this.setView.bind(null, ViewType.Markets)}>Markets</PlainButton>
+        <PlainButton weight={600} textColor={currentView === ViewType.Convert ? 'white' : 'light'} onClick={this.setView.bind(null, ViewType.Convert)}>Convert</PlainButton>
+        <PlainButton weight={600} textColor={currentView === ViewType.Summary ? 'white' : 'light'} onClick={this.setView.bind(null, ViewType.Summary)}>Summary</PlainButton>
       </BasicBox>
       {this.renderView()}
     </>
   }
 
   renderTitle () {
-    const { selectedAsset } = this.state
-    const { optedIntoMarkets, showContent, widgetTitle } = this.props
-    const shouldShowBackArrow = !selectedAsset && showContent && optedIntoMarkets
+    const selectedAsset = this.props.ftx.assetDetail?.currencyName
+    const { showContent, widgetTitle } = this.props
+    // Only show back arrow to go back to opt-in view
+    const shouldShowBackArrow = !selectedAsset &&
+      this.props.ftx.currentView !== ViewType.OptIn &&
+      !this.props.ftx.isConnected
 
     return (
       <Header showContent={showContent}>
@@ -444,8 +408,17 @@ class FTX extends React.PureComponent<Props, State> {
     )
   }
 
+  renderContent() {
+    return <>
+      {this.props.ftx.currentView === ViewType.OptIn
+        ? this.renderPreOptIn()
+        : this.renderIndex()
+      }
+    </>
+  }
+
   render () {
-    const { showContent, optedIntoMarkets } = this.props
+    const { showContent } = this.props
 
     if (!showContent) {
       return this.renderTitleTab()
@@ -457,11 +430,7 @@ class FTX extends React.PureComponent<Props, State> {
         <ThemeProvider theme={customizeTheme(theme)}>
           <WidgetWrapper tabIndex={0}>
             {this.renderTitle()}
-            {(optedIntoMarkets) ? (
-              this.renderIndex()
-            ) : (
-              this.renderPreOptIn()
-            )}
+            {this.renderContent()}
           </WidgetWrapper>
         </ThemeProvider>
       }
