@@ -790,7 +790,7 @@ BATClassLedgerBridge(BOOL, useShortRetries, setUseShortRetries, short_retries)
 - (void)processSKUItems:(NSArray<BATSKUOrderItem *> *)items
              completion:(void (^)(BATResult result, NSString *orderID))completion
 {
-  ledger->ProcessSKU(VectorFromNSArray(items, ^ledger::type::SKUOrderItem(BATSKUOrderItem *item) {
+  ledger->ProcessSKU(VectorFromNSArray(items, ^ledger::type::SKUOrderItemPtr(BATSKUOrderItem *item) {
     return *item.cppObjPtr;
   }), ledger::constant::kWalletUnBlinded, ^(const ledger::type::Result result, const std::string& order_id) {
     completion(static_cast<BATResult>(result), [NSString stringWithUTF8String:order_id.c_str()]);

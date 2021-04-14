@@ -1158,12 +1158,7 @@ void BatLedgerImpl::ProcessSKU(
   auto* holder = new CallbackHolder<ProcessSKUCallback>(
       AsWeakPtr(), std::move(callback));
 
-  std::vector<ledger::mojom::SKUOrderItem> sku_items;
-  for (auto && item : std::move(items)) {
-    sku_items.push_back(*item);
-  }
-
-  ledger_->ProcessSKU(sku_items,
+  ledger_->ProcessSKU(std::move(items),
                       wallet_type,
                       std::bind(BatLedgerImpl::OnSKUProcessed,
                                 holder,

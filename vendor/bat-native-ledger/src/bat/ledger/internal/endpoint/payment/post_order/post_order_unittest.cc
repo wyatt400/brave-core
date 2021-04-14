@@ -79,15 +79,15 @@ TEST_F(PostOrderTest, ServerOK) {
             callback(response);
           }));
 
-  type::SKUOrderItem item;
-  item.quantity = 4;
-  item.sku = "asdfasfasfdsdf";
-  item.type = type::SKUOrderItemType::SINGLE_USE;
-  std::vector<type::SKUOrderItem> items;
-  items.push_back(item);
+  type::SKUOrderItemPtr item = ledger::type::SKUOrderItem::New();
+  item->quantity = 4;
+  item->sku = "asdfasfasfdsdf";
+  item->type = type::SKUOrderItemType::SINGLE_USE;
+  std::vector<type::SKUOrderItemPtr> items;
+  items.push_back(std::move(item));
 
   order_->Request(
-      items,
+      std::move(items),
       [](const type::Result result, type::SKUOrderPtr order) {
         auto expected_order_item = type::SKUOrderItem::New();
         expected_order_item->order_id = "f2e6494e-fb21-44d1-90e9-b5408799acd8";
@@ -123,15 +123,15 @@ TEST_F(PostOrderTest, ServerError400) {
             callback(response);
           }));
 
-  type::SKUOrderItem item;
-  item.quantity = 4;
-  item.sku = "asdfasfasfdsdf";
-  item.type = type::SKUOrderItemType::SINGLE_USE;
-  std::vector<type::SKUOrderItem> items;
-  items.push_back(item);
+  type::SKUOrderItemPtr item = ledger::type::SKUOrderItem::New();
+  item->quantity = 4;
+  item->sku = "asdfasfasfdsdf";
+  item->type = type::SKUOrderItemType::SINGLE_USE;
+  std::vector<type::SKUOrderItemPtr> items;
+  items.push_back(std::move(item));
 
   order_->Request(
-      items,
+      std::move(items),
       [](const type::Result result, type::SKUOrderPtr order) {
         EXPECT_EQ(result, type::Result::RETRY_SHORT);
         EXPECT_TRUE(!order);
@@ -151,15 +151,15 @@ TEST_F(PostOrderTest, ServerError500) {
             callback(response);
           }));
 
-  type::SKUOrderItem item;
-  item.quantity = 4;
-  item.sku = "asdfasfasfdsdf";
-  item.type = type::SKUOrderItemType::SINGLE_USE;
-  std::vector<type::SKUOrderItem> items;
-  items.push_back(item);
+  type::SKUOrderItemPtr item = ledger::type::SKUOrderItem::New();
+  item->quantity = 4;
+  item->sku = "asdfasfasfdsdf";
+  item->type = type::SKUOrderItemType::SINGLE_USE;
+  std::vector<type::SKUOrderItemPtr> items;
+  items.push_back(std::move(item));
 
   order_->Request(
-      items,
+      std::move(items),
       [](const type::Result result, type::SKUOrderPtr order) {
         EXPECT_EQ(result, type::Result::RETRY_SHORT);
         EXPECT_TRUE(!order);
@@ -179,15 +179,15 @@ TEST_F(PostOrderTest, ServerErrorRandom) {
             callback(response);
           }));
 
-  type::SKUOrderItem item;
-  item.quantity = 4;
-  item.sku = "asdfasfasfdsdf";
-  item.type = type::SKUOrderItemType::SINGLE_USE;
-  std::vector<type::SKUOrderItem> items;
-  items.push_back(item);
+  type::SKUOrderItemPtr item = ledger::type::SKUOrderItem::New();
+  item->quantity = 4;
+  item->sku = "asdfasfasfdsdf";
+  item->type = type::SKUOrderItemType::SINGLE_USE;
+  std::vector<type::SKUOrderItemPtr> items;
+  items.push_back(std::move(item));
 
   order_->Request(
-      items,
+      std::move(items),
       [](const type::Result result, type::SKUOrderPtr order) {
         EXPECT_EQ(result, type::Result::LEDGER_ERROR);
         EXPECT_TRUE(!order);
