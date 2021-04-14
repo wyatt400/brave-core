@@ -13,7 +13,6 @@
 
 #include "base/memory/weak_ptr.h"
 #include "brave/components/brave_search/common/brave_search.mojom.h"
-#include "url/gurl.h"
 
 namespace network {
 class SharedURLLoaderFactory;
@@ -35,7 +34,7 @@ class BraveSearchHost final : public brave_search::mojom::BraveSearchFallback {
                           const std::string& country,
                           const std::string& geo,
                           FetchBackupResultsCallback callback) override;
-  static void SetBackupProviderForTest(const GURL&);
+  static void SetBackupResultForTest(const std::string&);
 
  private:
   using SimpleURLLoaderList =

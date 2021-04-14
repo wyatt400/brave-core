@@ -7,10 +7,12 @@
 
 #include <utility>
 
+#include "base/no_destructor.h"
 #include "base/strings/stringprintf.h"
 #include "net/base/load_flags.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/public/cpp/simple_url_loader.h"
+#include "url/gurl.h"
 
 namespace {
 net::NetworkTrafficAnnotationTag GetNetworkTrafficAnnotationTag() {
@@ -37,13 +39,14 @@ net::NetworkTrafficAnnotationTag GetNetworkTrafficAnnotationTag() {
 }
 
 const unsigned int kRetriesCountOnNetworkChange = 1;
-static GURL backup_provider_for_test;
+static base::NoDestructor<std::string> backup_provider_result_for_test("");
 }  // namespace
 
 namespace brave_search {
 
-void BraveSearchHost::SetBackupProviderForTest(const GURL& backup_provider) {
-  backup_provider_for_test = backup_provider;
+void BraveSearchHost::SetBackupResultForTest(
+    const std::string& backup_provider_result) {
+  *backup_provider_result_for_test = backup_provider_result;
 }
 
 BraveSearchHost::BraveSearchHost(
@@ -59,13 +62,14 @@ void BraveSearchHost::FetchBackupResults(const std::string& query,
                                          FetchBackupResultsCallback callback) {
   auto request = std::make_unique<network::ResourceRequest>();
 
-  if (backup_provider_for_test.is_empty()) {
+  if (backup_provider_result_for_test->empty()) {
     std::string spec(
         base::StringPrintf("https://www.google.com/search?q=%s&hl=%s&gl=%s",
                            query.c_str(), lang.c_str(), country.c_str()));
     request->url = GURL(spec);
   } else {
-    request->url = backup_provider_for_test;
+    std::move(callback).Run(*backup_provider_result_for_test);
+    return;
   }
   request->load_flags = net::LOAD_BYPASS_CACHE | net::LOAD_DISABLE_CACHE;
   request->credentials_mode = network::mojom::CredentialsMode::kOmit;
