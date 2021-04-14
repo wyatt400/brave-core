@@ -8,6 +8,7 @@ import Amount from './amount'
 import Box from './box'
 import BoxAlert from './boxAlert'
 import CategoryLikePicker from './categoryLikePicker'
+import ConnectWallet from './connectWallet'
 import DisabledContent from './disabledContent'
 import DisabledPanel from './disabledPanel'
 import Donate from './donate'
@@ -35,6 +36,7 @@ import Profile from './profile'
 import RestoreSites from './restoreSites'
 import RewardsButton from './rewardsButton'
 import SettingsPage from './settingsPage'
+import SelectWallet from './selectWallet'
 import ShowAdsHistory from './showAdsHistory'
 import SidebarPromo from './sidebarPromo'
 import SiteBanner from './siteBanner'
@@ -63,6 +65,7 @@ export {
   Box,
   BoxAlert,
   CategoryLikePicker,
+  ConnectWallet,
   DisabledContent,
   DisabledPanel,
   Donate,
@@ -89,6 +92,7 @@ export {
   Profile,
   RestoreSites,
   RewardsButton,
+  SelectWallet,
   SettingsPage,
   ShowAdsHistory,
   SidebarPromo,
