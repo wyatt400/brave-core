@@ -129,12 +129,14 @@ void AdBlockSubscriptionServiceManager::DeleteSubscription(const SubscriptionIde
 }
 
 void AdBlockSubscriptionServiceManager::RefreshSubscription(const SubscriptionIdentifier& id) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   auto it = subscription_services_.find(id);
   DCHECK(it != subscription_services_.end());
   download_manager_->StartDownload(it->second->GetInfo().list_url, true);
 }
 
 void AdBlockSubscriptionServiceManager::RefreshAllSubscriptions() {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   for (const auto& subscription_service : subscription_services_) {
     download_manager_->StartDownload(subscription_service.second->GetInfo().list_url, false);
   }

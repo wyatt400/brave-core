@@ -29,6 +29,10 @@
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 
+namespace {
+const base::TimeDelta LIST_UPDATE_INTERVAL = base::TimeDelta::FromDays(7);
+}
+
 namespace brave_shields {
 
 FilterListSubscriptionInfo BuildInfoFromDict(const GURL& list_url, const base::Value* dict) {
@@ -56,6 +60,8 @@ AdBlockSubscriptionService::AdBlockSubscriptionService(
   AdBlockBaseService(delegate),
   list_url_(list_url),
   enabled_(true) { // TODO only enable after successful update?
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+  content::GetUIThreadTaskRunner({base::TaskPriority::BEST_EFFORT})->PostTask(FROM_HERE, base::BindOnce(&AdBlockSubscriptionServiceManager::RefreshSubscription, base::Unretained(g_brave_browser_process->ad_block_service()->subscription_service_manager()), list_url_));
 }
 
 // Constructor from cached information
@@ -68,9 +74,20 @@ AdBlockSubscriptionService::AdBlockSubscriptionService(
   enabled_(cached_info.enabled),
   last_update_attempt_(cached_info.last_update_attempt),
   last_update_was_successful_(cached_info.last_update_was_successful) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   GetTaskRunner()->PostTask(
           FROM_HERE,
           base::BindOnce(&AdBlockSubscriptionService::ReloadFilters, base::Unretained(this)));
+
+  const base::Time next_update = last_update_attempt_ + LIST_UPDATE_INTERVAL;
+  const base::TimeDelta until_next_update = next_update - base::Time::Now();
+  // Schedule the next update for the list - either immediately, or in the
+  // future with a delayed task
+  if (until_next_update <= base::TimeDelta::FromSeconds(0)) {
+    content::GetUIThreadTaskRunner({base::TaskPriority::BEST_EFFORT})->PostTask(FROM_HERE, base::BindOnce(&AdBlockSubscriptionServiceManager::RefreshSubscription, base::Unretained(g_brave_browser_process->ad_block_service()->subscription_service_manager()), list_url_));
+  } else {
+    update_timer_.Start(FROM_HERE, until_next_update, base::BindOnce(&AdBlockSubscriptionServiceManager::RefreshSubscription, base::Unretained(g_brave_browser_process->ad_block_service()->subscription_service_manager()), list_url_));
+  }
 }
 
 AdBlockSubscriptionService::~AdBlockSubscriptionService() {
@@ -114,6 +131,14 @@ void AdBlockSubscriptionService::OnSuccessfulDownload() {
   last_update_attempt_ = base::Time::Now();
 
   ReloadFilters();
+
+  content::GetUIThreadTaskRunner({})->PostTask(FROM_HERE, base::BindOnce(&AdBlockSubscriptionService::ScheduleRefreshOnUIThread, base::Unretained(this), LIST_UPDATE_INTERVAL));
+}
+
+void AdBlockSubscriptionService::ScheduleRefreshOnUIThread(base::TimeDelta time_until_download) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+
+  update_timer_.Start(FROM_HERE, time_until_download, base::BindOnce(&AdBlockSubscriptionServiceManager::RefreshSubscription, base::Unretained(g_brave_browser_process->ad_block_service()->subscription_service_manager()), list_url_));
 }
 
 void AdBlockSubscriptionService::OnComponentReady(

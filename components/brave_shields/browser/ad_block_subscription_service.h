@@ -66,6 +66,7 @@ class AdBlockSubscriptionService : public AdBlockBaseService {
       const std::string& component_id,
       const std::string& component_base64_public_key);
   void ReloadFilters();
+  void ScheduleRefreshOnUIThread(base::TimeDelta time_until_download);
 
   std::string list_contents_;
 
@@ -77,6 +78,8 @@ class AdBlockSubscriptionService : public AdBlockBaseService {
   bool enabled_;
   base::Time last_update_attempt_;
   bool last_update_was_successful_;
+
+  base::OneShotTimer update_timer_;
 
   base::WeakPtrFactory<AdBlockSubscriptionService> weak_factory_{this};
 
