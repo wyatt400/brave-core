@@ -26,6 +26,10 @@
 
 class PrefService;
 
+namespace brave_shields {
+class AdBlockSubscriptionServiceManagerObserver;
+}
+
 namespace base {
 class ListValue;
 class FilePath;
@@ -77,6 +81,10 @@ class AdBlockSubscriptionServiceManager {
 
   void OnNewListDownloaded(const SubscriptionIdentifier& id);
 
+  void AddObserver(AdBlockSubscriptionServiceManagerObserver* observer);
+  void RemoveObserver(AdBlockSubscriptionServiceManagerObserver* observer);
+  void NotifyObserversOfServiceEvent();
+
  private:
   friend class ::AdBlockServiceTest;
   bool Init();
@@ -95,6 +103,8 @@ class AdBlockSubscriptionServiceManager {
   std::map<SubscriptionIdentifier, std::unique_ptr<AdBlockSubscriptionService>> subscription_services_;
 
   std::unique_ptr<CustomSubscriptionDownloadManager> download_manager_;
+
+  base::ObserverList<AdBlockSubscriptionServiceManagerObserver> observers_;
 
   base::WeakPtrFactory<AdBlockSubscriptionServiceManager> weak_ptr_factory_{this};
 

@@ -7,6 +7,7 @@
 
 #include <memory>
 
+#include "base/scoped_observation.h"
 #include "brave/browser/brave_browser_process_impl.h"
 #include "brave/browser/ui/webui/brave_webui_source.h"
 #include "brave/common/webui_url_constants.h"
@@ -14,19 +15,24 @@
 #include "brave/components/brave_shields/browser/ad_block_custom_filters_service.h"
 #include "brave/components/brave_shields/browser/ad_block_regional_service_manager.h"
 #include "brave/components/brave_shields/browser/ad_block_subscription_service_manager.h"
+#include "brave/components/brave_shields/browser/ad_block_subscription_service_manager_observer.h"
 #include "brave/components/brave_shields/browser/ad_block_service.h"
 #include "components/grit/brave_components_resources.h"
 #include "content/public/browser/web_ui_message_handler.h"
 
 namespace {
 
-class AdblockDOMHandler : public content::WebUIMessageHandler {
+class AdblockDOMHandler : public content::WebUIMessageHandler,
+                          public brave_shields::AdBlockSubscriptionServiceManagerObserver {
  public:
   AdblockDOMHandler();
   ~AdblockDOMHandler() override;
 
   // WebUIMessageHandler implementation.
   void RegisterMessages() override;
+
+  // brave_shields::AdblockSubscriptionServiceManagerObserver overrides:
+  void OnServiceUpdateEvent() override;
 
  private:
   void HandleEnableFilterList(const base::ListValue* args);
@@ -38,6 +44,9 @@ class AdblockDOMHandler : public content::WebUIMessageHandler {
   void HandleSetSubscriptionEnabled(const base::ListValue* args);
   void HandleDeleteSubscription(const base::ListValue* args);
   void HandleRefreshSubscription(const base::ListValue* args);
+
+  base::ScopedObservation<brave_shields::AdBlockSubscriptionServiceManager, brave_shields::AdBlockSubscriptionServiceManagerObserver>
+      service_observer_{this};
 
   DISALLOW_COPY_AND_ASSIGN(AdblockDOMHandler);
 };
@@ -83,6 +92,17 @@ void AdblockDOMHandler::RegisterMessages() {
       "brave_adblock.refreshSubscription",
       base::BindRepeating(&AdblockDOMHandler::HandleRefreshSubscription,
                           base::Unretained(this)));
+
+  service_observer_.Observe(g_brave_browser_process->ad_block_service()->subscription_service_manager());
+}
+
+void AdblockDOMHandler::OnServiceUpdateEvent() {
+  if (!web_ui()->CanCallJavascript())
+    return;
+
+  // TODO refactor into separate method that doesn't require arguments here
+  auto callback_args = base::ListValue();
+  HandleGetListSubscriptions(&callback_args);
 }
 
 void AdblockDOMHandler::HandleEnableFilterList(const base::ListValue* args) {
