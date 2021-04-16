@@ -8,7 +8,6 @@
 #include "base/bind.h"
 #include "brave/components/brave_rewards/common/constants.h"
 #include "brave/components/payments/content/buildflags/buildflags.h"
-#include "content/public/browser/browser_context.h"
 #include "third_party/blink/public/mojom/payments/payment_request.mojom.h"
 
 using payments::mojom::PaymentErrorReason;
@@ -27,9 +26,6 @@ void PaymentRequest::Init(
     mojom::PaymentDetailsPtr details,
     mojom::PaymentOptionsPtr options) {
   bool result = false;
-  content::WebContents* contents = web_contents();
-  content::BrowserContext* context = contents->GetBrowserContext();
-
   for (size_t i = 0; i < method_data.size(); i++) {
     if (method_data[i]->supported_method == brave_rewards::kBatPaymentMethod) {
       result = true;
@@ -54,13 +50,6 @@ void PaymentRequest::Init(
     }
   } else {
     log_.Error(brave_rewards::errors::kInvalidData);
-    TerminateConnection();
-    return;
-  }
-
-  // BAT payment method only works in regular mode.
-  if (context->IsOffTheRecord()) {
-    log_.Error(brave_rewards::errors::kBraveRewardsNotEnabled);
     TerminateConnection();
     return;
   }

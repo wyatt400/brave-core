@@ -24,6 +24,7 @@
 #include "components/payments/core/payer_data.h"
 #include "components/web_modal/web_contents_modal_dialog_host.h"
 #include "content/public/browser/browser_context.h"
+#include "content/public/browser/browser_thread.h"
 #include "content/public/browser/web_contents.h"
 #include "third_party/blink/public/mojom/payments/payment_request.mojom.h"
 #include "ui/web_dialogs/web_dialog_delegate.h"
@@ -44,6 +45,11 @@ constexpr int kDialogMaxHeight = 800;
 void OnSKUProcessed(base::WeakPtr<payments::PaymentRequest> request,
                     const ledger::type::Result result,
                     const std::string& value) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+  if (!request) {
+    return;
+  }
+
   if (result == ledger::type::Result::LEDGER_OK) {
     payments::mojom::PaymentDetailsPtr details =
         payments::mojom::PaymentDetails::New();
@@ -56,10 +62,14 @@ void OnSKUProcessed(base::WeakPtr<payments::PaymentRequest> request,
 }
 
 void OnGetPublisherDetailsCallback(base::WeakPtr<PaymentRequest> request,
-                                   WebContents* contents,
                                    const ledger::type::Result result,
                                    ledger::type::PublisherInfoPtr info) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   double total = 0;
+  if (!request) {
+    return;
+  }
+
   if (!info || info->status == ledger::type::PublisherStatus::NOT_VERIFIED) {
     request->OnError(PaymentErrorReason::NOT_SUPPORTED,
                      brave_rewards::errors::kInvalidPublisher);
@@ -72,6 +82,7 @@ void OnGetPublisherDetailsCallback(base::WeakPtr<PaymentRequest> request,
                      errors::kInvalidData);
     return;
   }
+  auto* contents = request->web_contents();
 
   DCHECK(base::StringToDouble(spec->details().total->amount->value, &total));
   base::Value order_info(base::Value::Type::DICTIONARY);
@@ -117,6 +128,10 @@ GURL CheckoutDialogDelegate::GetDialogContentURL() const {
 
 void CheckoutDialogDelegate::GetWebUIMessageHandlers(
     std::vector<WebUIMessageHandler*>* handlers) const {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+  if (!request_) {
+    return;
+  }
   handlers->push_back(new CheckoutDialogHandler(request_));
 }
 
@@ -129,8 +144,14 @@ std::string CheckoutDialogDelegate::GetDialogArgs() const {
 }
 
 void CheckoutDialogDelegate::OnDialogClosed(const std::string& result) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   int reason = 0;
   DCHECK(base::StringToInt(result, &reason));
+
+  if (!request_) {
+    return;
+  }
+
   switch (reason) {
     case DialogCloseReason::UserCancelled:
       request_->OnError(PaymentErrorReason::USER_CANCEL,
@@ -177,7 +198,7 @@ void CheckoutDialogHandler::RegisterMessages() {
                           base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
       "getWalletBalance",
-      base::BindRepeating(&CheckoutDialogHandler::OnGetWalletBalance,
+      base::BindRepeating(&CheckoutDialogHandler::GetWalletBalance,
                           base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
       "getExternalWallet",
@@ -191,16 +212,13 @@ void CheckoutDialogHandler::RegisterMessages() {
 
 void CheckoutDialogHandler::HandlePaymentCompletion(
     const base::ListValue* args) {
-  auto spec = request_->spec();
-  if (!request_->spec()->IsInitialized()) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+  if (!request_) {
     return;
   }
 
-  auto* rfh =
-      content::RenderFrameHost::FromID(request_->initiator_frame_routing_id());
-  if (!rfh) {
-    request_->OnError(PaymentErrorReason::INVALID_DATA_FROM_RENDERER,
-                      errors::kInvalidRenderer);
+  auto spec = request_->spec();
+  if (!request_->spec()->IsInitialized()) {
     return;
   }
 
@@ -232,12 +250,12 @@ void CheckoutDialogHandler::GetRewardsParameters(const base::ListValue* args) {
   if (auto* service = GetRewardsService()) {
     AllowJavascript();
     service->GetRewardsParameters(
-        base::Bind(&CheckoutDialogHandler::GetRewardsParametersCallback,
+        base::Bind(&CheckoutDialogHandler::OnGetRewardsParameters,
                    weak_factory_.GetWeakPtr()));
   }
 }
 
-void CheckoutDialogHandler::GetRewardsParametersCallback(
+void CheckoutDialogHandler::OnGetRewardsParameters(
     ledger::type::RewardsParametersPtr parameters) {
   if (!IsJavascriptAllowed()) {
     return;
@@ -251,16 +269,16 @@ void CheckoutDialogHandler::GetRewardsParametersCallback(
   FireWebUIListener("rewardsParametersUpdated", data);
 }
 
-void CheckoutDialogHandler::OnGetWalletBalance(const base::ListValue* args) {
+void CheckoutDialogHandler::GetWalletBalance(const base::ListValue* args) {
   if (auto* service = GetRewardsService()) {
     AllowJavascript();
     service->FetchBalance(
-        base::BindOnce(&CheckoutDialogHandler::FetchBalanceCallback,
+        base::BindOnce(&CheckoutDialogHandler::OnFetchBalance,
                        weak_factory_.GetWeakPtr()));
   }
 }
 
-void CheckoutDialogHandler::FetchBalanceCallback(
+void CheckoutDialogHandler::OnFetchBalance(
     const ledger::type::Result result,
     ledger::type::BalancePtr balance) {
   if (!IsJavascriptAllowed()) {
@@ -277,12 +295,12 @@ void CheckoutDialogHandler::GetExternalWallet(const base::ListValue* args) {
   if (auto* service = GetRewardsService()) {
     AllowJavascript();
     service->GetExternalWallet(
-        base::BindOnce(&CheckoutDialogHandler::GetExternalWalletCallback,
+        base::BindOnce(&CheckoutDialogHandler::OnGetExternalWallet,
                        weak_factory_.GetWeakPtr()));
   }
 }
 
-void CheckoutDialogHandler::GetExternalWalletCallback(
+void CheckoutDialogHandler::OnGetExternalWallet(
     const ledger::type::Result result,
     ledger::type::ExternalWalletPtr wallet) {
   if (!IsJavascriptAllowed()) {
@@ -298,16 +316,28 @@ void CheckoutDialogHandler::GetExternalWalletCallback(
 }
 
 void ShowCheckoutDialog(base::WeakPtr<PaymentRequest> request) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+  if (!request) {
+    return;
+  }
+
   WebContents* initiator = request->web_contents();
   Profile* profile =
       Profile::FromBrowserContext(initiator->GetBrowserContext());
 
+  // BAT payment method doesn't work in private mode
+  if (profile->IsOffTheRecord()) {
+    request->OnError(PaymentErrorReason::NOT_SUPPORTED,
+                     brave_rewards::errors::kBraveRewardsNotEnabled);
+    return;
+  }
+
   // BAT payment method only works for verified publishers
   auto* service = brave_rewards::RewardsServiceFactory::GetForProfile(profile);
-  if (service->IsRewardsEnabled()) {
+  if (service && service->IsRewardsEnabled()) {
     service->GetPublisherInfo(
         initiator->GetLastCommittedURL().GetOrigin().host(),
-        base::BindOnce(&OnGetPublisherDetailsCallback, request, initiator));
+        base::BindOnce(&OnGetPublisherDetailsCallback, request));
   } else {
     request->OnError(PaymentErrorReason::NOT_SUPPORTED,
                      brave_rewards::errors::kBraveRewardsNotEnabled);

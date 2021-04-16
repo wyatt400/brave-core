@@ -74,16 +74,16 @@ class CheckoutDialogHandler : public content::WebUIMessageHandler {
 
   // Message handlers
   void HandlePaymentCompletion(const base::ListValue* args);
-  void OnGetWalletBalance(const base::ListValue* args);
+  void GetWalletBalance(const base::ListValue* args);
   void GetExternalWallet(const base::ListValue* args);
   void GetRewardsParameters(const base::ListValue* args);
 
   // Rewards service callbacks
-  void FetchBalanceCallback(const ledger::type::Result result,
-                            ledger::type::BalancePtr balance);
-  void GetExternalWalletCallback(const ledger::type::Result result,
-                                 ledger::type::ExternalWalletPtr wallet);
-  void GetRewardsParametersCallback(
+  void OnFetchBalance(const ledger::type::Result result,
+                      ledger::type::BalancePtr balance);
+  void OnGetExternalWallet(const ledger::type::Result result,
+                           ledger::type::ExternalWalletPtr wallet);
+  void OnGetRewardsParameters(
       ledger::type::RewardsParametersPtr parameters);
 
   RewardsService* rewards_service_ = nullptr;  // NOT OWNED

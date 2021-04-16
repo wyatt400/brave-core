@@ -23,9 +23,6 @@ BatPaymentAppFactory::~BatPaymentAppFactory() = default;
 // static
 bool BatPaymentAppFactory::IsBatSupportedMethod(
     base::WeakPtr<PaymentRequestSpec> spec) {
-#if defined(OS_ANDROID)
-  return false;
-#endif
   for (const auto& data : spec->method_data()) {
     if (data->supported_method == brave_rewards::kBatPaymentMethod) {
       return true;
