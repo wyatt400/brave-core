@@ -30,7 +30,8 @@ class BatPaymentAppFactory : public PaymentAppFactory {
  private:
   std::vector<std::unique_ptr<BatPaymentAppFactory>> factories_;
 
-  DISALLOW_COPY_AND_ASSIGN(BatPaymentAppFactory);
+  BatPaymentAppFactory(const BatPaymentAppFactory&) = delete;
+  BatPaymentAppFactory& operator=(const BatPaymentAppFactory&) = delete;
 };
 
 }  // namespace payments

@@ -57,7 +57,8 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
   base::Value params_;
   base::WeakPtr<payments::PaymentRequest> request_;
 
-  DISALLOW_COPY_AND_ASSIGN(CheckoutDialogDelegate);
+  CheckoutDialogDelegate(const CheckoutDialogDelegate&) = delete;
+  CheckoutDialogDelegate& operator=(const CheckoutDialogDelegate&) = delete;
 };
 
 class CheckoutDialogHandler : public content::WebUIMessageHandler {
@@ -92,7 +93,8 @@ class CheckoutDialogHandler : public content::WebUIMessageHandler {
   std::vector<::ledger::mojom::SKUOrderItemPtr> items_;
   base::WeakPtrFactory<CheckoutDialogHandler> weak_factory_;
 
-  DISALLOW_COPY_AND_ASSIGN(CheckoutDialogHandler);
+  CheckoutDialogHandler(const CheckoutDialogHandler&) = delete;
+  CheckoutDialogHandler& operator=(const CheckoutDialogHandler&) = delete;
 };
 
 void ShowCheckoutDialog(base::WeakPtr<payments::PaymentRequest> request);

@@ -46,7 +46,8 @@ class BatPaymentApp : public PaymentApp {
   base::WeakPtr<PaymentRequestSpec> spec_;
   base::WeakPtrFactory<BatPaymentApp> weak_ptr_factory_{this};
 
-  DISALLOW_COPY_AND_ASSIGN(BatPaymentApp);
+  BatPaymentApp(const BatPaymentApp&) = delete;
+  BatPaymentApp& operator=(const BatPaymentApp&) = delete;
 };
 
 }  // namespace payments
