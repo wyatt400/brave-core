@@ -5,7 +5,6 @@
 
 #include "components/payments/content/payment_request.h"
 
-#include "base/bind.h"
 #include "brave/components/brave_rewards/common/constants.h"
 #include "brave/components/payments/content/buildflags/buildflags.h"
 #include "third_party/blink/public/mojom/payments/payment_request.mojom.h"
@@ -15,8 +14,7 @@ using payments::mojom::PaymentErrorReason;
 #if BUILDFLAG(ENABLE_PAY_WITH_BAT)
 namespace payments {
 
-void PaymentRequest::OnError(PaymentErrorReason reason,
-                             std::string err) {
+void PaymentRequest::OnError(PaymentErrorReason reason, std::string err) {
   client_->OnError(reason, err);
 }
 
@@ -25,15 +23,13 @@ void PaymentRequest::Init(
     std::vector<mojom::PaymentMethodDataPtr> method_data,
     mojom::PaymentDetailsPtr details,
     mojom::PaymentOptionsPtr options) {
-  bool result = false;
-  for (size_t i = 0; i < method_data.size(); i++) {
-    if (method_data[i]->supported_method == brave_rewards::kBatPaymentMethod) {
-      result = true;
-      break;
-    }
-  }
+  std::vector<mojom::PaymentMethodDataPtr>::iterator it = std::find_if(
+      method_data.begin(), method_data.end(), [](const auto& method) {
+        return method->supported_method == brave_rewards::kBatPaymentMethod;
+      });
 
-  if (!result) {
+  // Only BAT payment method needs additional checks
+  if (it == method_data.end()) {
     Init_ChromiumImpl(std::move(client), std::move(method_data),
                       std::move(details), std::move(options));
     return;
