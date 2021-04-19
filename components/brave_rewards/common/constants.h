@@ -8,19 +8,20 @@
 
 namespace brave_rewards {
 
-extern const char kBatPaymentMethod[];
+constexpr char kBatPaymentMethod[] = "bat";
 
 namespace errors {
 
-extern const char kBatTransactionFailed[];
-extern const char kBraveRewardsNotEnabled[];
-extern const char kInsufficientBalance[];
-extern const char kInvalidData[];
-extern const char kInvalidPublisher[];
-extern const char kInvalidRenderer[];
-extern const char kRewardsNotInitialized[];
-extern const char kTransactionCancelled[];
-extern const char kUnverifiedUserWallet[];
+constexpr char kBatTransactionFailed[] = "BAT transaction failed";
+constexpr char kBraveRewardsNotEnabled[] =
+   "Brave rewards should be enabled to use Pay with BAT";
+constexpr char kInsufficientBalance[] = "Insufficient Balance";
+constexpr char kInvalidData[] = "Invalid data in payment request";
+constexpr char kInvalidPublisher[] = "Unverified publisher";
+constexpr char kInvalidRenderer[] = "Renderer not found";
+constexpr char kRewardsNotInitialized[] = "Brave rewards is not initialized";
+constexpr char kTransactionCancelled[] = "Transaction cancelled";
+constexpr char kUnverifiedUserWallet[]  = "Unverified user wallet";
 
 }  // namespace errors
 

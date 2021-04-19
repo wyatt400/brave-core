@@ -40,21 +40,27 @@ void BatPaymentApp::InvokePaymentApp(base::WeakPtr<Delegate> delegate) {
 bool BatPaymentApp::IsCompleteForPayment() const {
   return true;
 }
+
 uint32_t BatPaymentApp::GetCompletenessScore() const {
   return 0;
 }
+
 bool BatPaymentApp::CanPreselect() const {
   return true;
 }
+
 base::string16 BatPaymentApp::GetMissingInfoLabel() const {
   return base::EmptyString16();
 }
+
 bool BatPaymentApp::HasEnrolledInstrument() const {
   return false;
 }
+
 void BatPaymentApp::RecordUse() {
   return;
 }
+
 bool BatPaymentApp::NeedsInstallation() const {
   return false;
 }
@@ -85,12 +91,15 @@ base::WeakPtr<PaymentApp> BatPaymentApp::AsWeakPtr() {
 bool BatPaymentApp::HandlesShippingAddress() const {
   return false;
 }
+
 bool BatPaymentApp::HandlesPayerName() const {
   return false;
 }
+
 bool BatPaymentApp::HandlesPayerEmail() const {
   return false;
 }
+
 bool BatPaymentApp::HandlesPayerPhone() const {
   return false;
 }

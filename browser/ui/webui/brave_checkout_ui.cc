@@ -12,9 +12,7 @@
 #include "brave/components/brave_rewards/resources/grit/brave_rewards_checkout_generated_map.h"
 #include "brave/components/brave_rewards/resources/grit/brave_rewards_resources.h"
 #include "chrome/browser/profiles/profile.h"
-#include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui_data_source.h"
-#include "content/public/browser/web_ui_message_handler.h"
 
 BraveCheckoutUI::BraveCheckoutUI(content::WebUI* web_ui,
                                  const std::string& name)

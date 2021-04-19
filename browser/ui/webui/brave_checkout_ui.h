@@ -8,7 +8,6 @@
 
 #include <string>
 
-#include "base/macros.h"
 #include "chrome/browser/ui/webui/constrained_web_dialog_ui.h"
 
 class BraveCheckoutUI : public ConstrainedWebDialogUI {
@@ -17,7 +16,8 @@ class BraveCheckoutUI : public ConstrainedWebDialogUI {
   ~BraveCheckoutUI() override;
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(BraveCheckoutUI);
+  BraveCheckoutUI(const BraveCheckoutUI&) = delete;
+  BraveCheckoutUI& operator=(const BraveCheckoutUI&) = delete;
 };
 
 #endif  // BRAVE_BROWSER_UI_WEBUI_BRAVE_CHECKOUT_UI_H_
