@@ -5,7 +5,7 @@
 
 #include "chrome/browser/ui/views/payments/payment_request_dialog_view.h"
 
-#include "brave/browser/brave_rewards/checkout_dialog.h"
+#include "brave/browser/ui/brave_rewards/checkout_dialog.h"
 #include "brave/components/brave_rewards/common/constants.h"
 #include "brave/components/payments/content/bat_payment_app_factory.h"
 
