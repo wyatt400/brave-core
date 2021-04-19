@@ -61,6 +61,7 @@ source_set("ui") {
 
     deps = [
       "//base",
+      "//brave/vendor/bat-native-ledger:headers",
       "//components/payments/content/",
       "//components/payments/core/",
       "//components/web_modal/",
