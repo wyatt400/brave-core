@@ -43,14 +43,14 @@ constexpr int kDialogMinHeight = 200;
 constexpr int kDialogMaxHeight = 800;
 
 void OnSKUProcessed(base::WeakPtr<payments::PaymentRequest> request,
-                    const ledger::type::Result result,
+                    const ledger::mojom::Result result,
                     const std::string& value) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   if (!request) {
     return;
   }
 
-  if (result == ledger::type::Result::LEDGER_OK) {
+  if (result == ledger::mojom::Result::LEDGER_OK) {
     payments::mojom::PaymentDetailsPtr details =
         payments::mojom::PaymentDetails::New();
     details->id = value;
@@ -62,15 +62,15 @@ void OnSKUProcessed(base::WeakPtr<payments::PaymentRequest> request,
 }
 
 void OnGetPublisherDetailsCallback(base::WeakPtr<PaymentRequest> request,
-                                   const ledger::type::Result result,
-                                   ledger::type::PublisherInfoPtr info) {
+                                   const ledger::mojom::Result result,
+                                   ledger::mojom::PublisherInfoPtr info) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   double total = 0;
   if (!request) {
     return;
   }
 
-  if (!info || info->status == ledger::type::PublisherStatus::NOT_VERIFIED) {
+  if (!info || info->status == ledger::mojom::PublisherStatus::NOT_VERIFIED) {
     request->OnError(PaymentErrorReason::NOT_SUPPORTED,
                      brave_rewards::errors::kInvalidPublisher);
     return;
@@ -233,7 +233,7 @@ void CheckoutDialogHandler::HandlePaymentCompletion(
       spec->GetDisplayItems(request_->state()->selected_app());
   for (size_t i = 0; i < display_items.size(); i++) {
     DCHECK((*display_items[i])->sku.has_value());
-    auto item = ledger::type::SKUOrderItem::New();
+    auto item = ledger::mojom::SKUOrderItem::New();
 
     item->sku = (*display_items[i])->sku.value();
     item->quantity = 1;
@@ -256,7 +256,7 @@ void CheckoutDialogHandler::GetRewardsParameters(const base::ListValue* args) {
 }
 
 void CheckoutDialogHandler::OnGetRewardsParameters(
-    ledger::type::RewardsParametersPtr parameters) {
+    ledger::mojom::RewardsParametersPtr parameters) {
   if (!IsJavascriptAllowed()) {
     return;
   }
@@ -279,8 +279,8 @@ void CheckoutDialogHandler::GetWalletBalance(const base::ListValue* args) {
 }
 
 void CheckoutDialogHandler::OnFetchBalance(
-    const ledger::type::Result result,
-    ledger::type::BalancePtr balance) {
+    const ledger::mojom::Result result,
+    ledger::mojom::BalancePtr balance) {
   if (!IsJavascriptAllowed()) {
     return;
   }
@@ -301,8 +301,8 @@ void CheckoutDialogHandler::GetExternalWallet(const base::ListValue* args) {
 }
 
 void CheckoutDialogHandler::OnGetExternalWallet(
-    const ledger::type::Result result,
-    ledger::type::ExternalWalletPtr wallet) {
+    const ledger::mojom::Result result,
+    ledger::mojom::ExternalWalletPtr wallet) {
   if (!IsJavascriptAllowed()) {
     return;
   }

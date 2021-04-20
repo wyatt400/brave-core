@@ -247,7 +247,7 @@ class MockRewardsService : public RewardsService {
 
   MOCK_CONST_METHOD0(IsRewardsEnabled, bool());
   MOCK_METHOD3(ProcessSKU,
-               void(std::vector<ledger::type::SKUOrderItemPtr> items,
+               void(std::vector<ledger::mojom::SKUOrderItemPtr> items,
                     const std::string& wallet_type,
                     brave_rewards::ProcessSKUCallback callback));
 };

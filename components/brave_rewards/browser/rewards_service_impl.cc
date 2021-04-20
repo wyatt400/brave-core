@@ -3464,7 +3464,7 @@ std::string RewardsServiceImpl::GetExternalWalletType() const {
 }
 
 void RewardsServiceImpl::ProcessSKU(
-    std::vector<ledger::type::SKUOrderItemPtr> items,
+    std::vector<ledger::mojom::SKUOrderItemPtr> items,
     const std::string& wallet_type,
     ProcessSKUCallback callback) {
   bat_ledger_->ProcessSKU(std::move(items),
@@ -3474,7 +3474,7 @@ void RewardsServiceImpl::ProcessSKU(
 
 void RewardsServiceImpl::OnSKUProcessed(
     ProcessSKUCallback callback,
-    const ledger::type::Result result,
+    const ledger::mojom::Result result,
     const std::string& order_id) {
   std::move(callback).Run(result, order_id);
 }

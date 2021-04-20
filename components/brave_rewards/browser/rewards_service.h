@@ -132,7 +132,7 @@ using GetBraveWalletCallback =
     base::OnceCallback<void(ledger::type::BraveWalletPtr wallet)>;
 
 using ProcessSKUCallback =
-    base::OnceCallback<void(ledger::type::Result result, const std::string&)>;
+    base::OnceCallback<void(ledger::mojom::Result result, const std::string&)>;
 
 using GetWalletPassphraseCallback = base::Callback<void(const std::string&)>;
 
@@ -372,7 +372,7 @@ class RewardsService : public KeyedService {
   virtual void SetAdsEnabled(const bool is_enabled) = 0;
 
   virtual bool IsRewardsEnabled() const = 0;
-  virtual void ProcessSKU(std::vector<ledger::type::SKUOrderItemPtr> items,
+  virtual void ProcessSKU(std::vector<ledger::mojom::SKUOrderItemPtr> items,
                            const std::string& wallet_type,
                            ProcessSKUCallback callback) = 0;
 
