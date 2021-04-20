@@ -5,7 +5,7 @@ index 2b25a26c442d944048e8fdc159c6eab95be87b27..63bb1bc93feab2d6f73a6eb4d24fdd91
 @@ -78,6 +78,7 @@ class AvatarToolbarButton : public ToolbarButton,
    // ToolbarButton:
    void NotifyClick(const ui::Event& event) override;
-
+ 
 +BRAVE_AVATAR_BUTTON_H
   private:
    FRIEND_TEST_ALL_PREFIXES(AvatarToolbarButtonTest,
