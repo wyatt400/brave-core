@@ -9,7 +9,7 @@ interface StyledProps {
   isMobile?: boolean,
 }
 
-export const StyledWrapper = styled<StyledProps, 'div'>('div')`
+export const StyledWrapper = styled('div')<StyledProps>`
   overflow: hidden;
   font-family: ${p => p.theme.fontFamily.body};
   width: ${p => p.isMobile ? '100%' : '373px'};
@@ -21,7 +21,7 @@ export const StyledWrapper = styled<StyledProps, 'div'>('div')`
   position: relative;
 `
 
-export const StyledHeader = styled<{}, 'div'>('div')`
+export const StyledHeader = styled('div')<{}>`
   font-family: Poppins;
   font-weight: 600;
   font-size: 22px;
@@ -30,7 +30,7 @@ export const StyledHeader = styled<{}, 'div'>('div')`
   color: ${p => p.theme.palette.black};
 `
 
-export const StyledMessage = styled<{}, 'div'>('div')`
+export const StyledMessage = styled('div')<{}>`
   font-family: Poppins;
   font-size: 14px;
   text-align: center;
@@ -47,7 +47,7 @@ export const StyledImage = styled.img`
   margin-right: auto;
 `
 
-export const StyledNote = styled<{}, 'div'>('div')`
+export const StyledNote = styled('div')<{}>`
   font-family: Poppins;
   font-size: 12px;
   text-align: center;
@@ -57,7 +57,7 @@ export const StyledNote = styled<{}, 'div'>('div')`
   margin-right: 10.3%;
 `
 
-export const StyledButton = styled<{}, 'div'>('div')`
+export const StyledButton = styled('div')<{}>`
   margin: auto;
   display: block;
   text-align: center;
@@ -69,7 +69,7 @@ export const StyledButton = styled<{}, 'div'>('div')`
   cursor: pointer;
 `
 
-export const StyledButtonText = styled<{}, 'div'>('div')`
+export const StyledButtonText = styled('div')<{}>`
   font-family: Poppins, sans-serif;
   font-weight: 600;
   font-size: 13px;
@@ -78,14 +78,14 @@ export const StyledButtonText = styled<{}, 'div'>('div')`
   color: #FFFFFF;
 `
 
-export const StyledFooter = styled<{}, 'div'>('div')`
+export const StyledFooter = styled('div')<{}>`
   background: rgba(218, 220, 232, 0.25);
   margin-top: 17px;
   padding-bottom: 24px;
   text-align: center;
 `
 
-export const StyledFooterText = styled<{}, 'div'>('div')`
+export const StyledFooterText = styled('div')<{}>`
   font-family: Poppins;
   font-size: 14px;
   font-weight: 600;
@@ -93,7 +93,7 @@ export const StyledFooterText = styled<{}, 'div'>('div')`
   color: ${p => p.theme.palette.black};
 `
 
-export const StyledFooterLink = styled<{}, 'a'>('a')`
+export const StyledFooterLink = styled('a')<{}>`
   font-family: Poppins;
   font-size: 14px;  
 `
