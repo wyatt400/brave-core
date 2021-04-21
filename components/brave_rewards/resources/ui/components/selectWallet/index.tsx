@@ -27,6 +27,7 @@ import warningIcon from './assets/warning.svg'
 export interface Props {
   isMobile: boolean,
   showUpholdWarning: boolean,
+  onWalletSelected: () => void
 }
 
 interface State {
@@ -45,6 +46,7 @@ export default class SelectWallet extends React.PureComponent<Props, State> {
     const {
       isMobile,
       showUpholdWarning,
+      onWalletSelected
     } = this.props
 
     const onUpholdClicked = () => {
@@ -53,6 +55,7 @@ export default class SelectWallet extends React.PureComponent<Props, State> {
 
     const onGeminiClicked = () => {
       this.setState({ showUpholdWarning: false })
+      onWalletSelected();
     }
 
     return (

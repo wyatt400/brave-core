@@ -828,10 +828,12 @@ export class Panel extends React.Component<Props, State> {
     let walletStatus: WalletState | undefined = undefined
     let onVerifyClick = undefined
     let onContinue = this.selectWallet
+    let onWalletSelected = undefined
+
     if (!this.props.onlyAnonWallet) {
       walletStatus = utils.getWalletStatus(externalWallet)
       onVerifyClick = this.verifyClicked
-      //onVerifyClick = utils.handleExternalWalletLink.bind(this, balance, externalWallet)
+      onWalletSelected = utils.handleExternalWalletLink.bind(this, balance, externalWallet)
     }
 
     return (
@@ -847,6 +849,7 @@ export class Panel extends React.Component<Props, State> {
         <SelectWallet
           isMobile={false}
           showUpholdWarning={this.showUpholdWarning()}
+          onWalletSelected={onWalletSelected}
         >
         </SelectWallet>
         :

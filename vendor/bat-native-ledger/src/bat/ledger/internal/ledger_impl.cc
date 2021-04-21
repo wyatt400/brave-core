@@ -37,6 +37,7 @@ LedgerImpl::LedgerImpl(ledger::LedgerClient* client)
       api_(std::make_unique<api::API>(this)),
       recovery_(std::make_unique<recovery::Recovery>(this)),
       bitflyer_(std::make_unique<bitflyer::Bitflyer>(this)),
+      gemini_(std::make_unique<gemini::Gemini>(this)),
       uphold_(std::make_unique<uphold::Uphold>(this)),
       initialized_task_scheduler_(false),
       initializing_(false),
@@ -120,6 +121,10 @@ database::Database* LedgerImpl::database() const {
 
 bitflyer::Bitflyer* LedgerImpl::bitflyer() const {
   return bitflyer_.get();
+}
+
+gemini::Gemini* LedgerImpl::gemini() const {
+  return gemini_.get();
 }
 
 uphold::Uphold* LedgerImpl::uphold() const {
