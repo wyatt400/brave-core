@@ -1,0 +1,4 @@
+include_rules = [
+  "+../../../../../components/autofill_assistant/browser",
+  "+components/bookmarks/browser",
+]
