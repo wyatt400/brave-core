@@ -129,6 +129,7 @@
 					android:layout_weight="1"
 				    android:fontFamily="sans-serif"
 				    app:autoSizeMaxTextSize="34sp"
+				    android:gravity="center"
 		            app:autoSizeMinTextSize="12sp"
 		            app:autoSizeStepGranularity="2sp"
 		            app:autoSizeTextType="uniform"
