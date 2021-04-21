@@ -355,6 +355,14 @@
     "message": "Uphold",
     "description": "Select uphold wallet"
   },
+  "walletSelectUpholdMessage": {
+    "message": "Uphold requires a minimum balance of 25 BAT to create an account. If you connected an account previously, ",
+    "description": "Message to indicate wallet creation pre-requisite for Uphold"
+  },
+  "walletSelectUpholdMessageLink": {
+    "message": "continue to log in.",
+    "description": "Text with link to login to uphold"
+  },
   "unVerifiedCheck": {
     "message": "Refresh Status",
     "description": "Text of link that allows to check verified status of unverified publisher"

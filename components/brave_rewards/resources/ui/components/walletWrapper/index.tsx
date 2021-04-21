@@ -38,9 +38,6 @@ import {
   StyledVerifiedButtonText,
   StyledDialogList,
   StyledLink,
-  LoginMessage,
-  LoginMessageButtons,
-  LoginMessageText
 } from './style'
 import { getLocale } from 'brave-ui/helpers'
 import { GrantCaptcha, GrantComplete, GrantError, GrantWrapper, WalletPopup } from '../'
@@ -56,7 +53,6 @@ import {
 } from 'brave-ui/components/icons'
 
 import { BitflyerIcon } from '../../../shared/components/icons/bitflyer_icon'
-import { upholdMinimumBalance } from '../../../shared/lib/uphold'
 
 import giftIconUrl from './assets/gift.svg'
 import loveIconUrl from './assets/love.svg'
@@ -149,22 +145,19 @@ export interface Props {
   goToExternalWallet?: () => void
   greetings?: string
   onlyAnonWallet?: boolean
-  showLoginMessage?: boolean
 }
 
 export type Step = '' | 'captcha' | 'complete'
 
 interface State {
   verificationDetails: boolean
-  showLoginMessage: boolean
 }
 
 export default class WalletWrapper extends React.PureComponent<Props, State> {
   constructor (props: Props) {
     super(props)
     this.state = {
-      verificationDetails: false,
-      showLoginMessage: false
+      verificationDetails: false
     }
   }
 
@@ -185,14 +178,7 @@ export default class WalletWrapper extends React.PureComponent<Props, State> {
       return
     }
 
-    if (!this.props.showLoginMessage) {
-      action()
-      return
-    }
-
-    this.setState({
-      showLoginMessage: true
-    })
+    action();
   }
 
   onNotificationClick = () => {
@@ -546,12 +532,6 @@ export default class WalletWrapper extends React.PureComponent<Props, State> {
     )
   }
 
-  toggleLoginMessage = () => {
-    this.setState({
-      showLoginMessage: false
-    })
-  }
-
   render () {
     const {
       id,
@@ -689,39 +669,6 @@ export default class WalletWrapper extends React.PureComponent<Props, State> {
                 : this.generateNotification(notification)
             }
             <StyledCurve background={gradientTop} />
-            {
-              this.state.showLoginMessage
-              ? <LoginMessage>
-                  <LoginMessageText>
-                    <b>{getLocale('loginMessageTitle')}</b>
-                    <p>
-                      {
-                        getLocale('loginMessageText')
-                          .replace('$1', String(upholdMinimumBalance))
-                      }
-                    </p>
-                    <br/>
-                    {getLocale('walletVerificationNote3').replace('$1', walletProvider)}
-                  </LoginMessageText>
-                  <LoginMessageButtons>
-                    <Button
-                      level={'secondary'}
-                      type={'accent'}
-                      text={getLocale('cancel')}
-                      onClick={this.toggleLoginMessage}
-                      id={'cancel-login-button'}
-                    />
-                    <Button
-                      level={'primary'}
-                      type={'accent'}
-                      text={getLocale('login')}
-                      onClick={this.props.onVerifyClick}
-                      id={'login-button'}
-                    />
-                  </LoginMessageButtons>
-              </LoginMessage>
-              : null
-            }
           </StyledHeader>
           <StyledContent
             contentPadding={contentPadding}

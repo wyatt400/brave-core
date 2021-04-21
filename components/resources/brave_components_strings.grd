@@ -943,6 +943,8 @@
       <message name="IDS_BRAVE_UI_WALLET_SELECT_TITLE" desc="">Choose a wallet service</message>
       <message name="IDS_BRAVE_UI_WALLET_SELECT_TEXT" desc="">Choose a preferred wallet service. If you already have an account, you will be asked to log in.</message>
       <message name="IDS_BRAVE_UI_WALLET_SELECT_UPHOLD" desc="">Uphold</message>
+      <message name="IDS_BRAVE_UI_WALLET_SELECT_UPHOLD_MESSAGE" desc="">Uphold requires a minimum balance of 25 BAT to create an account. If you connected an account previously, </message>
+      <message name="IDS_BRAVE_UI_WALLET_SELECT_UPHOLD_MESSAGE_LINK" desc="">continue to log in.</message>
       <message name="IDS_BRAVE_UI_WALLET_VERIFICATION_BUTTON" desc="">Verify wallet</message>
       <message name="IDS_BRAVE_UI_WALLET_VERIFICATION_FOOTER" desc="">Our wallet service is provided by <ph name="PROVIDER">$1<ex>Uphold</ex></ph>.</message>
       <message name="IDS_BRAVE_UI_WALLET_VERIFICATION_ID" desc="">Please have your government issued ID available.</message>

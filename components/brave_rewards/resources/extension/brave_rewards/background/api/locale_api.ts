@@ -147,6 +147,8 @@ export const getUIMessages = (): Record<string, string> => {
     'walletSelectText',
     'walletSelectTitle',
     'walletSelectUphold',
+    'walletSelectUpholdMessage',
+    'walletSelectUpholdMessageLink',
     'walletVerificationButton',
     'walletVerificationFooter',
     'walletVerificationID',

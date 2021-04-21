@@ -7,22 +7,53 @@ import * as React from 'react'
 import {
   StyledBox,
   StyledHeader,
+  StyledImage,
   StyledMessage,
   StyledWrapper,
+  StyledWarningBox,
+  StyledWarningImage,
+  StyledWarningMessageBox,
+  StyledWarningMessageLink,
+  StyledWarningWrapper,
   StyledText
 } from './style'
 
 import { getLocale } from 'brave-ui/helpers'
 
+import geminiIcon from './assets/gemini.svg'
+import upholdIcon from './assets/uphold.svg'
+import warningIcon from './assets/warning.svg'
+
 export interface Props {
-  isMobile?: boolean
+  isMobile: boolean,
+  showUpholdWarning: boolean,
 }
 
-export default class Amount extends React.PureComponent<Props, {}> {
+interface State {
+  showUpholdWarning: boolean,
+}
+
+export default class SelectWallet extends React.PureComponent<Props, State> {
+  constructor (props: Props) {
+    super(props)
+    this.state = {
+      showUpholdWarning: false,
+    }
+  }
+
   render () {
     const {
       isMobile,
+      showUpholdWarning,
     } = this.props
+
+    const onUpholdClicked = () => {
+      this.setState({ showUpholdWarning: showUpholdWarning })
+    }
+
+    const onGeminiClicked = () => {
+      this.setState({ showUpholdWarning: false })
+    }
 
     return (
       <>
@@ -31,12 +62,29 @@ export default class Amount extends React.PureComponent<Props, {}> {
         >
           <StyledHeader>{getLocale('walletSelectTitle')}</StyledHeader>
           <StyledMessage>{getLocale('walletSelectText')}</StyledMessage>
-          <StyledBox>
+          <StyledBox
+            onClick={onGeminiClicked}
+          >
+            <StyledImage src={geminiIcon} />
             <StyledText>{getLocale('walletSelectGemini')}</StyledText>
           </StyledBox>
-          <StyledBox>
+          <StyledBox
+            onClick={onUpholdClicked}
+          >
+            <StyledImage src={upholdIcon} />
             <StyledText>{getLocale('walletSelectUphold')}</StyledText>
           </StyledBox>
+          <StyledWarningWrapper
+            showUpholdWarning={this.state.showUpholdWarning}
+          >
+            <StyledWarningBox>
+              <StyledWarningImage src={warningIcon} />
+              <StyledWarningMessageBox>
+              {getLocale('walletSelectUpholdMessage')}
+              <StyledWarningMessageLink>{getLocale('walletSelectUpholdMessageLink')}</StyledWarningMessageLink>
+              </StyledWarningMessageBox>
+            </StyledWarningBox>
+          </StyledWarningWrapper>
         </StyledWrapper>
       </>
     )

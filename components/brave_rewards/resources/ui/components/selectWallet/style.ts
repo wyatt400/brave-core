@@ -7,6 +7,7 @@ import styled from 'brave-ui/theme'
 interface StyledProps {
   compact?: boolean,
   isMobile?: boolean,
+  showUpholdWarning?: boolean,
 }
 
 export const StyledWrapper = styled('div')<StyledProps>`
@@ -19,12 +20,13 @@ export const StyledWrapper = styled('div')<StyledProps>`
   max-width: 415px;
   margin: 0 auto;
   position: relative;
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.25);
 `
 
 export const StyledHeader = styled('div')<{}>`
   font-family: Poppins;
   font-weight: 600;
-  font-size: 22px;
+  font-size: 20px;
   text-align: center;
   margin-top: 52px;
   color: ${p => p.theme.palette.black};
@@ -33,18 +35,56 @@ export const StyledHeader = styled('div')<{}>`
 export const StyledMessage = styled('div')<{}>`
   font-family: Poppins;
   font-size: 14px;
+  line-height: 22px;
   text-align: center;
-  margin-top: 18px;
-  margin-botton: 22px;
-  color: ${p => p.theme.palette.black};
   max-width: 316px;
+  color: ${p => p.theme.palette.black};
+  margin: 18px 30px 40px 30px;
+`
+export const StyledWarningWrapper = styled('div')<StyledProps>`
+  display: flex;
+  justify-content: center;
+  margin-top: 9px;
+  margin-bottom: 50px;
+  visibility: ${p => p.showUpholdWarning ? 'visible' : 'hidden'};
+`
+
+export const StyledWarningBox = styled('div')<{}>`
+  width: 304px;
+`
+
+export const StyledWarningMessageBox = styled('div')<{}>`
+  font-family: Poppins;
+  font-size: 14px;
+  line-height: 22px;
+  margin-top: -24px;
+  margin-left: 38px;
+  color: ${p => p.theme.palette.black};
+`
+
+export const StyledWarningMessageLink = styled('a')<{}>`
+  color: ${p => p.theme.palette.black};
 `
 
 export const StyledBox = styled('div')<{}>`
+  display: flex;
   width: 326px;
   height: 79px;
   margin: auto;
-  margin-top: 18px;
+  margin-bottom: 18px;
+  border: 2px solid #DADCE8;
+  border-radius: 8px;
+  :hover {
+      box-shadow: 0px 0px 0px 3px #392DD1;
+  }
+`
+
+export const StyledLastBox = styled('div')<{}>`
+  display: flex;
+  width: 326px;
+  height: 79px;
+  margin: auto;
+  margin-bottom: 122px;
   border: 2px solid #DADCE8;
   border-radius: 8px;
 `
@@ -61,12 +101,13 @@ export const StyledButton = styled('div')<{}>`
   cursor: pointer;
 `
 
-export const StyledText = styled('span')<{}>`
+export const StyledText = styled('div')<{}>`
+  display: flex;
+  align-items: center;
   font-family: Poppins, sans-serif;
   font-weight: 600;
   font-size: 16px;
-  text-align: center;
-  margin-top: calc(50% - 28px/2 - 55.5px);
+  margin-left: 30px;
 `
 
 export const StyledFooter = styled('div')<{}>`
@@ -87,4 +128,13 @@ export const StyledFooterText = styled('div')<{}>`
 export const StyledFooterLink = styled('a')<{}>`
   font-family: Poppins;
   font-size: 14px;  
+`
+
+export const StyledImage = styled.img`
+  vertical-align: middle;
+  margin-left: 20px;
+`
+
+export const StyledWarningImage = styled.img`
+  align-items: left;
 `

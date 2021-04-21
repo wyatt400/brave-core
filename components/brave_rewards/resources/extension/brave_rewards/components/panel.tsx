@@ -680,7 +680,7 @@ export class Panel extends React.Component<Props, State> {
     return utils.getPromotion(currentPromotion[0], onlyAnonWallet)
   }
 
-  showLoginMessage = () => {
+  showUpholdWarning = () => {
     const { balance, externalWallet } = this.props.rewardsPanelData
     const walletStatus = utils.getWalletStatus(externalWallet)
     const walletType = externalWallet ? externalWallet.type : ''
@@ -845,7 +845,9 @@ export class Panel extends React.Component<Props, State> {
         :
         this.state.stage == "select-wallet" ?
         <SelectWallet
-          isMobile={false}>
+          isMobile={false}
+          showUpholdWarning={this.showUpholdWarning()}
+        >
         </SelectWallet>
         :
         <WalletWrapper
@@ -871,7 +873,6 @@ export class Panel extends React.Component<Props, State> {
           goToExternalWallet={this.goToExternalWallet}
           greetings={utils.getGreetings(externalWallet)}
           onlyAnonWallet={this.props.onlyAnonWallet}
-          showLoginMessage={this.showLoginMessage()}
           {...notification}
         >
           <WalletSummarySlider

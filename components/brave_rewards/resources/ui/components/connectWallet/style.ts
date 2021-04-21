@@ -19,6 +19,7 @@ export const StyledWrapper = styled('div')<StyledProps>`
   max-width: 415px;
   margin: 0 auto;
   position: relative;
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.25);
 `
 
 export const StyledHeader = styled('div')<{}>`
