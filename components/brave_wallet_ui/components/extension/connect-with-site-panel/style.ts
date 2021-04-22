@@ -29,6 +29,7 @@ export const SelectAddressScrollContainer = styled.div`
   overflow-x: hidden;
   position: relative;
   max-height: 100px;
+  box-sizing: border-box;
 `
 
 export const MiddleWrapper = styled.div`
