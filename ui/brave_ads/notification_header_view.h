@@ -50,7 +50,7 @@ class NotificationHeaderView : public views::Button {
 
   const std::u16string& ad_name_for_testing() const;
 
-  const gfx::ImageSkia& ad_icon_for_testing() const;
+  gfx::ImageSkia ad_icon_for_testing() const;
 
  private:
   FRIEND_TEST_ALL_PREFIXES(NotificationHeaderViewTest, SettingsMode);

@@ -251,7 +251,7 @@ const std::u16string& NotificationHeaderView::ad_name_for_testing() const {
   return ad_name_view_->GetText();
 }
 
-const gfx::ImageSkia& NotificationHeaderView::ad_icon_for_testing() const {
+gfx::ImageSkia NotificationHeaderView::ad_icon_for_testing() const {
   return ad_icon_view_->GetImage();
 }
 
