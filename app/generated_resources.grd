@@ -1199,12 +1199,6 @@ are declared in tools/grit/grit_rule.gni.
         <message name="IDS_VISIT_DESKTOP_OF_LRU_USER" desc="The text label of the menu item which allows the user to move a window from one users desktop to another.">
           Move window to <ph name="USER_NAME">$1<ex>User name</ex></ph> (<ph name="USER_EMAIL">$2<ex>john@google.com</ex></ph>)
         </message>
-        <message name="IDS_MOVE_TO_DESKS_MENU" desc="The text label of the Move to Desks submenu">
-          Move window to desk
-        </message>
-        <message name="IDS_ASSIGN_TO_ALL_DESKS" desc="The text label of the Assign to All Desks menu item">
-          All desks
-        </message>
       </if>
 
       <message name="IDS_ACCNAME_ZOOM_PLUS2" desc="The accessible description of the Make Text Larger menu item in the merged menu">
@@ -4084,6 +4078,9 @@ are declared in tools/grit/grit_rule.gni.
         <message name="IDS_EXTENSION_PROMPT_WARNING_ENTERPRISE_PLATFORMKEYS" desc="Permission string for enterprise platform keys permission.">
           Perform security-related tasks for your organization, such as managing certificates and keys stored on the device
         </message>
+        <message name="IDS_EXTENSION_PROMPT_WARNING_ENTERPRISE_REPORTING_PRIVATE" desc="Permission string for enterprise private reporting permission.">
+          Read information about your browser, OS, and device
+        </message>
       </if>
 
       <!-- Extension/App error messages -->
@@ -6167,10 +6164,10 @@ Keep your key file in a safe place. You will need it to create new versions of y
           Suggest strong password
         </message>
         <message name="IDS_UPDATE_PASSWORD_DIALOG_TITLE" desc="The title of the update password dialog.">
-          Update password for <ph name="ORIGIN">$1<ex>example.com</ex></ph>
+          Update password for <ph name="ORIGIN">%1$s<ex>example.com</ex></ph>
         </message>
         <message name="IDS_UPDATE_PASSWORD_DIALOG_SIGNED_IN_DESCRIPTION" desc="The description at the bottom of update password dialog when the user is signed in.">
-          Passwords are saved in your Brave sync chain (<ph name="ACCOUNT">$1<ex>user@gmail.com</ex></ph>) so you can use them on any device
+          Passwords are saved in your Brave sync chain (<ph name="ACCOUNT">%1$s<ex>user@gmail.com</ex></ph>) so you can use them on any device
         </message>
       </if>
 
