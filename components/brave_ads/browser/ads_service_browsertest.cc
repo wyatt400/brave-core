@@ -16,6 +16,7 @@
 #include "base/strings/string_split.h"
 #include "base/strings/stringprintf.h"
 #include "base/test/bind.h"
+#include "bat/ads/pref_names.h"
 #include "bat/ledger/ledger.h"
 #include "brave/browser/brave_ads/ads_service_factory.h"
 #include "brave/browser/brave_rewards/rewards_service_factory.h"
@@ -27,6 +28,8 @@
 #include "brave/components/brave_rewards/browser/rewards_notification_service_impl.h"
 #include "brave/components/brave_rewards/browser/rewards_notification_service_observer.h"
 #include "brave/components/brave_rewards/browser/rewards_service_impl.h"
+#include "brave/components/brave_rewards/browser/rewards_service_observer.h"
+#include "brave/components/brave_rewards/browser/rewards_service.h"
 #include "brave/components/brave_rewards/browser/test/common/rewards_browsertest_util.h"
 #include "brave/components/brave_rewards/common/pref_names.h"
 #include "brave/components/l10n/browser/locale_helper_mock.h"
@@ -91,6 +94,26 @@ std::unique_ptr<net::test_server::HttpResponse> HandleRequest(
   return std::move(http_response);
 }
 
+class TestRewardsServiceObserver
+    : public brave_rewards::RewardsServiceObserver {
+ public:
+  explicit TestRewardsServiceObserver() = default;
+  ~TestRewardsServiceObserver() override = default;
+
+  void WaitForRewardsInitialization() {
+    run_loop_ = std::make_unique<base::RunLoop>();
+    run_loop_->Run();
+  }
+
+  // RewardsServiceObserver implementation
+  void OnRewardsInitialized(brave_rewards::RewardsService* service) override {
+    run_loop_->Quit();
+  }
+
+ private:
+  std::unique_ptr<base::RunLoop> run_loop_;
+};
+
 }  // namespace
 
 class BraveAdsBrowserTest : public InProcessBrowserTest,
@@ -128,6 +151,8 @@ class BraveAdsBrowserTest : public InProcessBrowserTest,
 
     rewards_service_ = static_cast<brave_rewards::RewardsServiceImpl*>(
         brave_rewards::RewardsServiceFactory::GetForProfile(browser_profile));
+    rewards_service_->AddObserver(&rewards_service_observer_);
+
     rewards_service_->ForTestingSetTestResponseCallback(base::BindRepeating(
         &BraveAdsBrowserTest::GetTestResponse, base::Unretained(this)));
 
@@ -135,13 +160,20 @@ class BraveAdsBrowserTest : public InProcessBrowserTest,
         brave_ads::AdsServiceFactory::GetForProfile(browser_profile));
     ASSERT_NE(nullptr, ads_service_);
     rewards_service_->SetLedgerEnvForTesting();
+
+    // Wait for Brave Rewards to be initialized before proceeding with the test,
+    // but only do it for tests where Ads is enabled, otherwise we won't get the
+    // OnRewardsInitialized() callback running () and we'd hang forever.
+    if (IsAdsEnabled() && !rewards_service_->IsInitialized())
+      rewards_service_observer_.WaitForRewardsInitialization();
   }
 
-  void TearDown() override {
+  void TearDownOnMainThread() override {
     // Code here will be called immediately after each test (right before the
     // destructor)
+    rewards_service_->RemoveObserver(&rewards_service_observer_);
 
-    InProcessBrowserTest::TearDown();
+    InProcessBrowserTest::TearDownOnMainThread();
   }
 
   void GetTestDataDir(base::FilePath* test_data_dir) {
@@ -360,6 +392,8 @@ class BraveAdsBrowserTest : public InProcessBrowserTest,
   MOCK_METHOD1(OnGetDebug, void(bool));
   MOCK_METHOD1(OnGetReconcileTime, void(int32_t));
   MOCK_METHOD1(OnGetShortRetries, void(bool));
+
+  TestRewardsServiceObserver rewards_service_observer_;
 
   std::unique_ptr<net::EmbeddedTestServer> https_server_;
 
