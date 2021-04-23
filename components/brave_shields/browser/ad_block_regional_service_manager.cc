@@ -12,7 +12,6 @@
 #include "base/strings/string_util.h"
 #include "base/task/post_task.h"
 #include "base/values.h"
-#include "brave/browser/brave_browser_process_impl.h"
 #include "brave/common/pref_names.h"
 #include "brave/components/adblock_rust_ffi/src/wrapper.h"
 #include "brave/components/brave_shields/browser/ad_block_regional_service.h"
@@ -38,7 +37,7 @@ AdBlockRegionalServiceManager::~AdBlockRegionalServiceManager() {
 
 void AdBlockRegionalServiceManager::StartRegionalServices() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  PrefService* local_state = g_browser_process->local_state();
+  PrefService* local_state = delegate_->local_state();
   if (!local_state)
     return;
 
@@ -53,7 +52,7 @@ void AdBlockRegionalServiceManager::StartRegionalServices() {
   if (!checked_default_region) {
     local_state->SetBoolean(kAdBlockCheckedDefaultRegion, true);
     auto it = brave_shields::FindAdBlockFilterListByLocale(
-        regional_catalog_, g_brave_browser_process->GetApplicationLocale());
+        regional_catalog_, delegate_->locale());
     if (it == regional_catalog_.end())
       return;
     EnableFilterList(it->uuid, true);
@@ -91,7 +90,7 @@ void AdBlockRegionalServiceManager::UpdateFilterListPrefs(
     const std::string& uuid,
     bool enabled) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  PrefService* local_state = g_browser_process->local_state();
+  PrefService* local_state = delegate_->local_state();
   if (!local_state)
     return;
   DictionaryPrefUpdate update(local_state, kAdBlockRegionalFilters);
@@ -279,7 +278,7 @@ AdBlockRegionalServiceManager::GetRegionalCatalog() {
 std::unique_ptr<base::ListValue>
 AdBlockRegionalServiceManager::GetRegionalLists() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  PrefService* local_state = g_browser_process->local_state();
+  PrefService* local_state = delegate_->local_state();
   if (!local_state)
     return nullptr;
   const base::DictionaryValue* regional_filters_dict =

@@ -1073,7 +1073,7 @@ void AdsServiceImpl::ClearAdsServiceForNotificationHandler() {
 }
 
 void AdsServiceImpl::OpenNewTabWithUrl(const std::string& url) {
-  if (g_brave_browser_process->IsShuttingDown()) {
+  if (g_browser_process->IsShuttingDown()) {
     return;
   }
 
