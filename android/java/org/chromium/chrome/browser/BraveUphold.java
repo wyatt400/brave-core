@@ -46,7 +46,7 @@ public class BraveUphold implements BraveRewardsObserver {
         mBraveExternalNavigationHandler = handler;
         rewardsNativeProxy = BraveRewardsNativeWorker.getInstance();
 
-        Uri uri = Uri.parse(params.getUrl());
+        Uri uri = Uri.parse(params.getUrl().getSpec());
         rewardsNativeProxy.AddObserver(this);
         String path = uri.getPath();
         String query = uri.getQuery();
