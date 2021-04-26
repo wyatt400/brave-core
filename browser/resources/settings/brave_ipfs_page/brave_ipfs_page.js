@@ -86,12 +86,6 @@ Polymer({
     router.navigateTo(router.getRoutes().BRAVE_IPFS_KEYS);
   },
   
-  isKeysEditorPath: function() {
-    console.log("isKeysEditorPath")
-    const router = Router.getInstance();
-    return (router.getCurrentRoute() == router.getRoutes().BRAVE_IPFS_KEYS);
-  },
-  
   onChangeIpfsMethod_: function() {
     const resolve_method = this.getPref('brave.ipfs.resolve_method').value;
     // Check if IPFS method is LOCAL_NODE
@@ -111,10 +105,10 @@ Polymer({
   },
   /** @protected */
   currentRouteChanged: function() {
-    let hidden = this.isKeysEditorPath();
-    
-    this.mainBlockVisibility_ = hidden ? 'hidden' : ''
-    console.log("hidden", hidden, "s.mainBlockVisibility_", this.mainBlockVisibility_)
+    const router = Router.getInstance();
+    let keys_editor =
+      (router.getCurrentRoute() == router.getRoutes().BRAVE_IPFS_KEYS);
+    this.mainBlockVisibility_ = keys_editor ? 'hidden' : ''
   },
   
   onChangeIpfsStorageMax_: function() {

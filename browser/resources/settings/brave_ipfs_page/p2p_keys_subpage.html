@@ -1,13 +1,12 @@
 <link rel="import" href="chrome://resources/html/cr.html">
 <link rel="import" href="chrome://resources/html/polymer.html">
-
 <link rel="import" href="chrome://resources/cr_elements/cr_link_row/cr_link_row.html">
 <link rel="import" href="chrome://resources/html/i18n_behavior.html">
 <link rel="import" href="chrome://resources/html/web_ui_listener_behavior.html">
 <link rel="import" href="../settings_page/settings_section.html">
 <link rel="import" href="../settings_shared_css.html">
 <link rel="import" href="../settings_vars_css.html">
-
+<link rel="import" href="brave_ipfs_browser_proxy.html">
 <dom-module id="settings-p2p-keys-subpage">
 <template>
 <style include="cr-shared-style settings-shared iron-flex">
@@ -44,16 +43,17 @@
       </cr-button>
     </div>
     <div class="flex" id="listContainer">
-      <iron-list items="[[getKeysItems_()]]" class="flex"
+      <iron-list items="[[keys_]]" class="flex"
           preserve-focus risk-selection>
         <template>
           <div class="settings-box">
-            <div class="flex ">
-              {{item}}
+            <div class="flex cr-padded-text">
+              <div>{{item.name}}</div>
+              <div class="secondary">{{item.value}}</div>
             </div>
             <cr-icon-button class="icon-delete-gray"
                 on-click="onKeyDeleteTapped_"
-                aria-label$="[[getButtonAriaLabel_(item)]]">
+                aria-label$="[[getButtonAriaLabel_(item.name)]]">
             </cr-icon-button>
           </div>
         </template>
@@ -61,6 +61,10 @@
     </div>
   </div>
 </div>
+<template is="dom-if" if="[[showAddp2pKeyDialog_]]" restamp>
+  <add-p2p-key-dialog prefs="{{prefs}}" on-close="onAddKeyDialogClosed_">
+  </add-p2p-key-dialog>
+</template>
 
 </template>
 <script src="p2p_keys_subpage.js"></script>

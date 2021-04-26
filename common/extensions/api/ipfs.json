@@ -13,6 +13,25 @@
     ],
     "functions": [
       {
+        "name": "getIPNSKeysList",
+        "type": "function",
+        "description": "Get list of available p2p keys",
+        "parameters": [
+          {
+            "name": "callback",
+            "type": "function",
+            "description": "Function called when keys list are fetched",
+            "parameters": [
+              {
+                "name": "keys",
+                "type": "string",
+                "description": "json stringified avalable keys list"
+              }
+            ]
+          }
+        ]
+      },
+      {
         "name": "getResolveMethodList",
         "type": "function",
         "description": "Get methods for resolving IPFS URIs",

@@ -45,6 +45,16 @@ export class BraveIPFSBrowserProxyImpl {
       chrome.ipfs.getResolveMethodList(resolve)
     })
   }
+  /** @override */
+  getIPNSKeysList () {
+    return new Promise(resolve => {
+      if (!chrome.ipfs) {
+        resolve(false)
+        return
+      }
+      chrome.ipfs.getIPNSKeysList(resolve)
+    })
+  }
 
   /** @override */
   getIPFSEnabled () {

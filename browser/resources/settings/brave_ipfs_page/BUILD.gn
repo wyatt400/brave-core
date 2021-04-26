@@ -31,6 +31,7 @@ polymer_modulizer("p2p_keys_subpage") {
   js_file = "p2p_keys_subpage.js"
   html_file = "p2p_keys_subpage.html"
   html_type = "dom-module"
+  auto_imports = settings_auto_imports + [ "brave/browser/resources/settings/brave_ipfs_page/brave_ipfs_browser_proxy.html|BraveIPFSBrowserProxy, BraveIPFSBrowserProxyImpl" ]
   namespace_rewrites = settings_namespace_rewrites
 }
 
@@ -42,6 +43,7 @@ js_modulizer("modules") {
 
 html_to_js("templatize") {
   js_files = [
-    "change_ipfs_gateway_dialog.js"
+    "change_ipfs_gateway_dialog.js",
+    "add_p2p_key_dialog.js",
   ]
 }

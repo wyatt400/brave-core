@@ -15,6 +15,7 @@
 #include "brave/components/ipfs/ipfs_constants.h"
 #include "brave/components/ipfs/ipfs_service.h"
 #include "brave/components/ipfs/ipfs_utils.h"
+#include "brave/components/ipfs/keys/ipns_keys_manager.h"
 #include "brave/grit/brave_generated_resources.h"
 #include "chrome/common/channel_info.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -39,10 +40,43 @@ base::Value MakeSelectValue(const base::string16& name,
   return item;
 }
 
+base::Value MakeValue(const std::string& name,
+                      const std::string& value) {
+  base::Value item(base::Value::Type::DICTIONARY);
+  item.SetKey("value", base::Value(value));
+  item.SetKey("name", base::Value(name));
+  return item;
+}
+
 }  // namespace
 
 namespace extensions {
 namespace api {
+
+ExtensionFunction::ResponseAction IpfsGetIPNSKeysListFunction::Run() {
+  
+  if (!IsIpfsEnabled(browser_context()))
+      return RespondNow(Error("IPFS not enabled"));
+  ::ipfs::IpfsService* ipfs_service =
+    GetIpfsService(browser_context());
+  if (!ipfs_service) {
+    return RespondNow(Error("Could not obtain IPFS service"));
+  }
+  ::ipfs::IpnsKeysManager* key_manager = ipfs_service->GetIpnsKeysManager();
+  if (!ipfs_service->IsDaemonLaunched() || !key_manager) {
+    return RespondNow(Error("IPFS node is not launched"));
+  }
+
+  auto keys = key_manager->GetKeys();
+  
+  base::Value list(base::Value::Type::LIST);
+  for (const auto& key : keys) {
+    list.Append(MakeValue(key.first, key.second));
+  }
+  std::string json_string;
+  base::JSONWriter::Write(list, &json_string);
+  return RespondNow(OneArgument(base::Value(json_string)));
+}
 
 ExtensionFunction::ResponseAction IpfsGetResolveMethodListFunction::Run() {
   base::Value list(base::Value::Type::LIST);

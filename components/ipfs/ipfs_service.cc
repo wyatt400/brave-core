@@ -237,6 +237,7 @@ void IpfsService::InitKeysManager() {
   if (!ipns_keys_manager_)
     ipns_keys_manager_ =
         std::make_unique<IpnsKeysManager>(context_, server_endpoint_);
+  ipns_keys_manager_->SynchronizeKeys(base::NullCallback());
 }
 
 void IpfsService::OnIpfsLaunched(bool result, int64_t pid) {

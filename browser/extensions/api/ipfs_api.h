@@ -24,6 +24,15 @@ class IpfsGetResolveMethodListFunction : public ExtensionFunction {
   ResponseAction Run() override;
 };
 
+class IpfsGetIPNSKeysListFunction : public ExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("ipfs.getIPNSKeysList", UNKNOWN)
+
+ protected:
+  ~IpfsGetIPNSKeysListFunction() override {}
+  ResponseAction Run() override;
+};
+
 class IpfsGetIPFSEnabledFunction : public ExtensionFunction {
  public:
   DECLARE_EXTENSION_FUNCTION("ipfs.getIPFSEnabled", UNKNOWN)

@@ -47,7 +47,9 @@ class IpnsKeysManager {
   void GenerateNewKey(const std::string& name, GenerateKeyCallback callback);
   void RemoveKey(const std::string& name, RemoveKeyCallback callback);
   bool KeyExists(const std::string& name) const;
-
+  const std::unordered_map<std::string, std::string>& GetKeys() const {
+    return keys_;
+  }
   void SetServerEndpointForTest(const GURL& gurl);
 
  private:

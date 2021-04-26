@@ -1,19 +1,12 @@
-// Copyright (c) 2020 The Brave Authors. All rights reserved.
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this file,
-// you can obtain one at http://mozilla.org/MPL/2.0/.
-
-// Copyright (c) 2020 The Brave Authors. All rights reserved.
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this file,
-// you can obtain one at http://mozilla.org/MPL/2.0/.
-/**
- * @fileoverview
- * 'brave-sync-setup' is the UI for starting or joining a sync chain
- * settings.
- */
-import {Router} from '../router.m.js';
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+ import {Router} from '../router.m.js';
  
+ 
+(function() {
+  'use strict';
+  
 /**
 * @fileoverview
 * 'settings-sync-subpage' is the settings page content
@@ -25,29 +18,21 @@ Polymer({
   ],
 
   properties: {
-    readOnlyList: {
-      type: Boolean,
-      value: false,
-    },
-
     /**
      * Array of sites to display in the widget.
      * @type {!Array<SiteException>}
      */
-     keys: {
+    keys_: {
       type: Array,
       value() {
         return [];
       },
     },
-    /** @private */
-    lastFocused_: Object,
-
-    /** @private */
-    listBlurred_: Boolean,
-
-    /** @private */
-    tooltipText_: String,
+    
+    showAddp2pKeyDialog_: {
+      type: Boolean,
+      value: true,
+    }
   },
   
   activeDialogAnchor_: null,
@@ -57,34 +42,31 @@ Polymer({
 
   /** @override */
   created: function() {
-    console.log("created");
-    this.keys = ["11111111111", "222222222222", "333333333333", "4444444444"]
-    // this.browserProxy_ = SyncBrowserProxyImpl.getInstance();
+    this.browserProxy_ = settings.BraveIPFSBrowserProxyImpl.getInstance();
   },
 
   /** @override */
   ready: function() {
-    console.log("ready");
+    this.browserProxy_.getIPNSKeysList().then(list => {
+      if (!list) {
+        return;
+      }
+      this.keys_ = JSON.parse(list)
+    });
   },
-
-  /** @override */
-  attached: function() {
-    console.log("attached");
+  
+  onAddKeyTap_: function(item) {
+    console.log("onAddKeyTap_", item);
+    this.showAddp2pKeyDialog_ = true
   },
-
-  onAddKeyTap_: function() {
-    console.log("onAddKeyTap_");
+  
+  onAddKeyDialogClosed_: function() {
+    console.log("onAddKeyDialogClosed_");
+    this.showAddp2pKeyDialog_ = false
   },
-  /**
-   * @return {!Array<!SiteException>}
-   * @private
-   */
-   getKeysItems_() {
-    return this.keys.slice();
-   },
-   
-   onKeyDeleteTapped_: function() {
-    console.log("onKeyDeleteTapped_");
+  
+  onKeyDeleteTapped_: function(item) {
+    console.log("onKeyDeleteTapped_", item);
   },
   
   getButtonAriaLabel_: function() {
@@ -92,3 +74,4 @@ Polymer({
   },
 
 });
+})();
