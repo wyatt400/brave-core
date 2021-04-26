@@ -14,7 +14,7 @@
  * settings.
  */
 import {Polymer, html} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
-
+import {Route, RouteObserverBehavior, Router} from '../router.m.js';
 /**
 * @fileoverview
 * 'settings-sync-subpage' is the settings page content
@@ -25,7 +25,7 @@ Polymer({
   _template: html`{__html_template__}`,
 
   behaviors: [
-
+    RouteObserverBehavior,
   ],
 
   properties: {

@@ -97,28 +97,30 @@
       >
      </cr-input>
     </div>
-    <cr-link-row id="p2pKeysLinkRow" route-path="/keys"  start-icon="settings20:vpn-key"
-      class="hr" label="$i18n{ipfsIpnsKeysLinkTitle}"
-      sub-label="[[ipfsIpnsKeysLinkTitleDesc]]"
-      on-click="onP2pKeysEditorClick_"
-      role-description="$i18n{subpageArrowRoleDescription}">
-    </cr-link-row>
+    <settings-animated-pages id="p2p-keys" section="ipfs">
+      <div route-path="default">
+        <cr-link-row id="p2pKeysLinkRow" start-icon="settings20:vpn-key"
+          class="hr" label="$i18n{ipfsIpnsKeysLinkTitle}"
+          sub-label="[[ipfsIpnsKeysLinkTitleDesc]]"
+          on-click="onP2pKeysEditorClick_"
+          role-description="$i18n{subpageArrowRoleDescription}">
+        </cr-link-row>
+      </div>
+      <template is="dom-if" route-path="/ipfs/keys">
+        <settings-subpage
+          associated-control="[[$$('#p2pKeysLinkRow')]]"
+          page-title="[[$i18n{ipfsIpnsKeysLinkTitle}]]">
+          <settings-p2p-keys-manager>
+          </settings-p2p-keys-manager>
 
-    <template is="dom-if" route-path="/ipfs/keys">
-      <settings-subpage
-        associated-control="[[$$('#p2pKeysLinkRow')]]"
-        page-title="[[ipfsIpnsKeysLinkTitle]]">
-        <settings-p2p-keys-manager>
-        </settings-p2p-keys-manager>
-
-      </settings-subpage>
-  
-    </template>
-  
+        </settings-subpage>
+    
+      </template>
+    </settings-animated-pages>
     <template is="dom-if" if="[[showChangeIPFSGatewayDialog_]]" restamp>
         <change-ipfs-gateway-dialog prefs="{{prefs}}" on-close="onChangeIPFSGatewayDialogClosed_">
         </change-ipfs-gateway-dialog>
     </template>
   </template>
   <script src="brave_ipfs_page.js"></script>
-</settings-animated-pages>
+</dom-module>

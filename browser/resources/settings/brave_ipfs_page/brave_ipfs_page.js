@@ -1,11 +1,9 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
- import './change_ipfs_gateway_dialog.js';
- import {PrefsBehavior} from '../prefs/prefs_behavior.m.js';
- import {Router} from '../router.m.js';
- import {routes} from '../route.js';
- import './p2p_keys_subpage.js';
+import {PrefsBehavior} from '../prefs/prefs_behavior.m.js';
+import {Router} from '../router.m.js';
+
  
 (function() {
 'use strict';
