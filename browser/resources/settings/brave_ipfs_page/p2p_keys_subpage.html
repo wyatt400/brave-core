@@ -10,7 +10,7 @@
 
 <dom-module id="settings-p2p-keys-subpage">
 <template>
-<style include="settings-shared md-select iron-flex">
+<style include="cr-shared-style settings-shared iron-flex">
   .settings-row:not(:first-child) {
     border-top: var(--cr-separator-line);
   }
@@ -23,33 +23,39 @@
     display: flex;
     padding: 8px 1em;
   }
-
-  .main-container {
-    height: 100%;
-    width: 100%;
+  #keys-section {
+    display: block;
+    background-color: var(--cr-card-background-color);
+    padding-block-end: 0;
+    padding-block-start: 0;
+    padding-inline-end: var(--cr-section-padding);
+    padding-inline-start: var(--cr-section-indent-padding);
   }
 </style>
 
-<div class="settings-box flex-container main-container">
-  <div id="category">
-    <div class="cr-row first">
-      <h2 class$="flex [[getCssClass_(enableContentSettingsRedesign_)]]">
-        $i18n{ipfsIpnsKeysLinkTitle}
-      </h2>
-      <cr-button id="addSite" class="header-aligned-button" on-click="onAddKeyTap_">
+<div id="keys-section" class="flex-container">
+  <div id="category" class="flex">
+    <div class="settings-row">
+      <div class="flex cr-padded-text">
+          $i18n{ipfsKeysListTitle}
+      </div>
+      <cr-button id="addSite" on-click="onAddKeyTap_">
         $i18n{add}
       </cr-button>
     </div>
-    <div class="list-frame menu-content vertical-list" id="listContainer">
-      <iron-list items="[[getKeysItems_()]]"
+    <div class="flex" id="listContainer">
+      <iron-list items="[[getKeysItems_()]]" class="flex"
           preserve-focus risk-selection>
         <template>
-          <site-list-entry model="[[item]]" read-only-list="[[readOnlyList]]"
-              on-show-action-menu="onShowActionMenu_" tabindex$="[[tabIndex]]"
-              first$="[[!index]]" iron-list-tab-index="[[tabIndex]]"
-              last-focused="{{lastFocused_}}" list-blurred="{{listBlurred_}}"
-              focus-row-index="[[index]]">
-          </site-list-entry>
+          <div class="settings-box">
+            <div class="flex ">
+              {{item}}
+            </div>
+            <cr-icon-button class="icon-delete-gray"
+                on-click="onKeyDeleteTapped_"
+                aria-label$="[[getButtonAriaLabel_(item)]]">
+            </cr-icon-button>
+          </div>
         </template>
       </iron-list>
     </div>

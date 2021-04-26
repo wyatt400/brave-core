@@ -58,7 +58,7 @@ Polymer({
   /** @override */
   created: function() {
     console.log("created");
-    keys = ["1", "2", "3", "4"]
+    this.keys = ["11111111111", "222222222222", "333333333333", "4444444444"]
     // this.browserProxy_ = SyncBrowserProxyImpl.getInstance();
   },
 
@@ -82,12 +82,13 @@ Polymer({
    getKeysItems_() {
     return this.keys.slice();
    },
-
-   onShowActionMenu_(e) {
-    this.activeDialogAnchor_ = /** @type {!HTMLElement} */ (e.detail.anchor);
-    this.actionMenuSite_ = e.detail.model;
-    /** @type {!CrActionMenuElement} */ (this.$$('cr-action-menu'))
-        .showAt(this.activeDialogAnchor_);
+   
+   onKeyDeleteTapped_: function() {
+    console.log("onKeyDeleteTapped_");
+  },
+  
+  getButtonAriaLabel_: function() {
+    return "getButtonAriaLabel_";
   },
 
 });

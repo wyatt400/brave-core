@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 import {PrefsBehavior} from '../prefs/prefs_behavior.m.js';
-import {Router} from '../router.m.js';
+import {Router, RouteObserverBehavior} from '../router.m.js';
 
  
 (function() {
@@ -17,7 +17,8 @@ Polymer({
 
   behaviors: [
     WebUIListenerBehavior,
-    PrefsBehavior
+    PrefsBehavior,
+    RouteObserverBehavior
   ],
   
   /** 
@@ -34,7 +35,8 @@ Polymer({
     ipfsEnabled_: Boolean,
     showChangeIPFSGatewayDialog_: Boolean,
     isStorageMaxEnabled_: Boolean,
-    showIPFSLearnMoreLink_: Boolean
+    showIPFSLearnMoreLink_: Boolean,
+    mainBlockVisibility_: String
   },
 
   /** @private {?settings.BraveIPFSBrowserProxy} */
@@ -84,6 +86,12 @@ Polymer({
     router.navigateTo(router.getRoutes().BRAVE_IPFS_KEYS);
   },
   
+  isKeysEditorPath: function() {
+    console.log("isKeysEditorPath")
+    const router = Router.getInstance();
+    return (router.getCurrentRoute() == router.getRoutes().BRAVE_IPFS_KEYS);
+  },
+  
   onChangeIpfsMethod_: function() {
     const resolve_method = this.getPref('brave.ipfs.resolve_method').value;
     // Check if IPFS method is LOCAL_NODE
@@ -101,7 +109,14 @@ Polymer({
     }
     this.lastUsedMethod_ = resolve_method;
   },
-
+  /** @protected */
+  currentRouteChanged: function() {
+    let hidden = this.isKeysEditorPath();
+    
+    this.mainBlockVisibility_ = hidden ? 'hidden' : ''
+    console.log("hidden", hidden, "s.mainBlockVisibility_", this.mainBlockVisibility_)
+  },
+  
   onChangeIpfsStorageMax_: function() {
     this.browserProxy_.setIPFSStorageMax(Number(this.$.ipfsStorageMax.value));
   },

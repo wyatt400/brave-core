@@ -763,6 +763,9 @@ By installing this extension, you are agreeing to the Google Widevine Terms of U
       <message name="IDS_SETTINGS_IPNS_KEYS_EDITOR_LINK_DESC" desc="The title of the descriptoin for the link to open keys management block in IPFS settings">
         Sign content by the corresponding private key and publish it to IPNS
       </message>
+      <message name="IDS_SETTINGS_IPNS_KEYS_LIST_TITLE" desc="The title of the keys management list in IPFS settings">
+        IPNS keys available for publishing
+      </message>
       <message name="IDS_SETTINGS_RESOLVE_IPFS_URLS_DESC" desc="The description for how to handle IPFS URIs">
         Method to resolve IPFS resources
       </message>
