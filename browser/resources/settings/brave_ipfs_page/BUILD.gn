@@ -13,6 +13,7 @@ import("../settings.gni")
 group("web_modules") {
   public_deps = [
     ":brave_ipfs_page_module",
+    ":p2p_keys_subpage_module",
     ":modules",
     ":templatize",
   ]
@@ -26,6 +27,13 @@ polymer_modulizer("brave_ipfs_page") {
   namespace_rewrites = settings_namespace_rewrites
 }
 
+polymer_modulizer("p2p_keys_subpage") {
+  js_file = "p2p_keys_subpage.js"
+  html_file = "p2p_keys_subpage.html"
+  html_type = "dom-module"
+  namespace_rewrites = settings_namespace_rewrites
+}
+
 
 js_modulizer("modules") {
   input_files = [ "brave_ipfs_browser_proxy.js" ]
@@ -34,7 +42,6 @@ js_modulizer("modules") {
 
 html_to_js("templatize") {
   js_files = [
-    "change_ipfs_gateway_dialog.js",
-    "p2p_keys_subpage.js"
+    "change_ipfs_gateway_dialog.js"
   ]
 }
