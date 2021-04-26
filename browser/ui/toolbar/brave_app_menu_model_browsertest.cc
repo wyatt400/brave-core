@@ -152,19 +152,13 @@ IN_PROC_BROWSER_TEST_F(BraveAppMenuBrowserTest, MenuOrderTest) {
   CheckCommandsAreDisabledInMenuModel(private_browser,
                                       commands_disabled_for_private_profile);
 
+  ui_test_utils::BrowserChangeObserver browser_creation_observer(
+      nullptr, ui_test_utils::BrowserChangeObserver::ChangeType::kAdded);
   profiles::SwitchToGuestProfile(ProfileManager::CreateCallback());
 
-  ui_test_utils::WaitForBrowserToOpen();
-
-  auto* browser_list = BrowserList::GetInstance();
-  Browser* guest_browser = nullptr;
-  for (Browser* browser : *browser_list) {
-    if (browser->profile()->IsGuestSession()) {
-      guest_browser = browser;
-      break;
-    }
-  }
+  Browser* guest_browser = browser_creation_observer.Wait();
   DCHECK(guest_browser);
+  EXPECT_TRUE(guest_browser->profile()->IsGuestSession());
   std::vector<int> commands_in_order_for_guest_profile = {
     IDC_NEW_TAB,
     IDC_NEW_WINDOW,
@@ -196,15 +190,9 @@ IN_PROC_BROWSER_TEST_F(BraveAppMenuBrowserTest, MenuOrderTest) {
 
 #if BUILDFLAG(ENABLE_TOR)
   brave::NewOffTheRecordWindowTor(browser());
-  ui_test_utils::WaitForBrowserToOpen();
-  Browser* tor_browser = nullptr;
-  for (Browser* browser : *browser_list) {
-    if (browser->profile()->IsTor()) {
-      tor_browser = browser;
-      break;
-    }
-  }
+  Browser* tor_browser = browser_creation_observer.Wait();
   DCHECK(tor_browser);
+  EXPECT_TRUE(tor_browser->profile()->IsTor());
   std::vector<int> commands_in_order_for_tor_profile = {
     IDC_NEW_TAB,
     IDC_NEW_TOR_CONNECTION_FOR_SITE,

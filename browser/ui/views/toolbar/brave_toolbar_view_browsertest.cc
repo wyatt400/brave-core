@@ -67,9 +67,11 @@ IN_PROC_BROWSER_TEST_F(BraveToolbarViewTest,
 IN_PROC_BROWSER_TEST_F(BraveToolbarViewTest, AvatarButtonIsShownGuestProfile) {
   // Open a Guest window.
   EXPECT_EQ(1U, BrowserList::GetInstance()->size());
+  ui_test_utils::BrowserChangeObserver browser_creation_observer(
+      nullptr, ui_test_utils::BrowserChangeObserver::ChangeType::kAdded);
   profiles::SwitchToGuestProfile(ProfileManager::CreateCallback());
   base::RunLoop().RunUntilIdle();
-  ui_test_utils::WaitForBrowserToOpen();
+  browser_creation_observer.Wait();
   EXPECT_EQ(2U, BrowserList::GetInstance()->size());
 
   // Retrieve the new Guest profile.
@@ -106,11 +108,13 @@ IN_PROC_BROWSER_TEST_F(BraveToolbarViewTest,
 
   // Open the new profile
   EXPECT_EQ(1U, BrowserList::GetInstance()->size());
+  ui_test_utils::BrowserChangeObserver browser_creation_observer(
+      nullptr, ui_test_utils::BrowserChangeObserver::ChangeType::kAdded);
   profiles::OpenBrowserWindowForProfile(ProfileManager::CreateCallback(), false,
                                         true, true, new_profile,
                                         Profile::CREATE_STATUS_INITIALIZED);
   base::RunLoop().RunUntilIdle();
-  ui_test_utils::WaitForBrowserToOpen();
+  browser_creation_observer.Wait();
   EXPECT_EQ(2U, BrowserList::GetInstance()->size());
 
   // Check it's shown in second profile

@@ -89,6 +89,8 @@ class OnionLocationNavigationThrottleBrowserTest : public InProcessBrowserTest {
     EXPECT_EQ(onion_button->GetText(),
               l10n_util::GetStringUTF16((IDS_LOCATION_BAR_OPEN_IN_TOR)));
 
+    ui_test_utils::BrowserChangeObserver browser_creation_observer(
+        nullptr, ui_test_utils::BrowserChangeObserver::ChangeType::kAdded);
     ui::MouseEvent pressed(ui::ET_MOUSE_PRESSED, gfx::Point(), gfx::Point(),
                            ui::EventTimeForNow(), ui::EF_LEFT_MOUSE_BUTTON,
                            ui::EF_LEFT_MOUSE_BUTTON);
@@ -97,7 +99,7 @@ class OnionLocationNavigationThrottleBrowserTest : public InProcessBrowserTest {
                             ui::EF_LEFT_MOUSE_BUTTON);
     views::test::ButtonTestApi(onion_button).NotifyClick(pressed);
     views::test::ButtonTestApi(onion_button).NotifyClick(released);
-    ui_test_utils::WaitForBrowserToOpen();
+    browser_creation_observer.Wait();
     BrowserList* browser_list = BrowserList::GetInstance();
     ASSERT_EQ(2U, browser_list->size());
     Browser* tor_browser = browser_list->get(1);
@@ -171,11 +173,13 @@ IN_PROC_BROWSER_TEST_F(OnionLocationNavigationThrottleBrowserTest,
   ASSERT_FALSE(browser_list->get(0)->profile()->IsTor());
   ASSERT_EQ(browser(), browser_list->get(0));
 
+  ui_test_utils::BrowserChangeObserver browser_creation_observer(
+      nullptr, ui_test_utils::BrowserChangeObserver::ChangeType::kAdded);
   content::WebContents* web_contents =
       browser()->tab_strip_model()->GetActiveWebContents();
   content::TestNavigationObserver nav_observer(web_contents);
   ui_test_utils::NavigateToURL(browser(), GURL(kTestOnionURL));
-  ui_test_utils::WaitForBrowserToOpen();
+  browser_creation_observer.Wait();
   nav_observer.Wait();
   // Original request was blocked
   EXPECT_EQ(nav_observer.last_net_error_code(), net::ERR_BLOCKED_BY_CLIENT);
@@ -209,10 +213,12 @@ IN_PROC_BROWSER_TEST_F(OnionLocationNavigationThrottleBrowserTest,
                        OnionLocationHeader_AutoOnionRedirect) {
   browser()->profile()->GetPrefs()->SetBoolean(tor::prefs::kAutoOnionRedirect,
                                                true);
+  ui_test_utils::BrowserChangeObserver browser_creation_observer(
+      nullptr, ui_test_utils::BrowserChangeObserver::ChangeType::kAdded);
 
   GURL url = test_server()->GetURL("/onion");
   ui_test_utils::NavigateToURL(browser(), url);
-  ui_test_utils::WaitForBrowserToOpen();
+  browser_creation_observer.Wait();
   // We don't close the original tab
   EXPECT_EQ(browser()->tab_strip_model()->count(), 1);
   content::WebContents* web_contents =

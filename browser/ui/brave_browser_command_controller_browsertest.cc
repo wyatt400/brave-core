@@ -111,19 +111,13 @@ IN_PROC_BROWSER_TEST_F(BraveBrowserCommandControllerTest,
   EXPECT_TRUE(
       command_controller->IsCommandEnabled(IDC_SHOW_BRAVE_WEBCOMPAT_REPORTER));
 
+  ui_test_utils::BrowserChangeObserver browser_creation_observer(
+      nullptr, ui_test_utils::BrowserChangeObserver::ChangeType::kAdded);
   profiles::SwitchToGuestProfile(ProfileManager::CreateCallback());
 
-  ui_test_utils::WaitForBrowserToOpen();
-
-  auto* browser_list = BrowserList::GetInstance();
-  Browser* guest_browser = nullptr;
-  for (Browser* browser : *browser_list) {
-    if (browser->profile()->IsGuestSession()) {
-      guest_browser = browser;
-      break;
-    }
-  }
+  Browser* guest_browser = browser_creation_observer.Wait();
   DCHECK(guest_browser);
+  EXPECT_TRUE(guest_browser->profile()->IsGuestSession());
   command_controller = guest_browser->command_controller();
 #if BUILDFLAG(BRAVE_REWARDS_ENABLED)
   EXPECT_FALSE(command_controller->IsCommandEnabled(IDC_SHOW_BRAVE_REWARDS));
@@ -153,15 +147,9 @@ IN_PROC_BROWSER_TEST_F(BraveBrowserCommandControllerTest,
 
 #if BUILDFLAG(ENABLE_TOR)
   brave::NewOffTheRecordWindowTor(browser());
-  ui_test_utils::WaitForBrowserToOpen();
-  Browser* tor_browser = nullptr;
-  for (Browser* browser : *browser_list) {
-    if (browser->profile()->IsTor()) {
-      tor_browser = browser;
-      break;
-    }
-  }
+  Browser* tor_browser = browser_creation_observer.Wait();
   DCHECK(tor_browser);
+  EXPECT_TRUE(tor_browser->profile()->IsTor());
   command_controller = tor_browser->command_controller();
 #if BUILDFLAG(BRAVE_REWARDS_ENABLED)
   EXPECT_TRUE(command_controller->IsCommandEnabled(IDC_SHOW_BRAVE_REWARDS));
