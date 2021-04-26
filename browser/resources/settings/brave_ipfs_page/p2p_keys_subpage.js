@@ -34,28 +34,24 @@ Polymer({
       type: String,
       value: 'configure',
     },
-
   },
 
   /** @private {?SyncBrowserProxy} */
   browserProxy_: null,
-
 
   /** @override */
   created: function() {
     console.log("created");
     // this.browserProxy_ = SyncBrowserProxyImpl.getInstance();
   },
+
   /** @override */
   ready: function() {
     console.log("ready");
   },
+
   /** @override */
   attached: function() {
     console.log("attached");
-    const router = Router.getInstance();
-    if (router.getCurrentRoute() == router.getRoutes().BRAVE_IPFS_KEYS) {
-      this.onNavigateToPage_();
-    }
   },
 });

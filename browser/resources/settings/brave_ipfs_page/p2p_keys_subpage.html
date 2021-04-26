@@ -10,16 +10,30 @@
 
 <dom-module id="settings-p2p-keys-subpage">
 <template>
-<!-- Disabled content -->
-<div class="cr-row first" >
-  AAAAAAAA
+<style include="settings-shared md-select iron-flex">
+  .settings-row:not(:first-child) {
+    border-top: var(--cr-separator-line);
+  }
+  .flex {
+    align-self: center;
+    flex: 1 1 auto;
+  }
+
+  .flex-container {
+    display: flex;
+    padding: 8px 1em;
+  }
+
+</style>
+
+<div class="settings-box flex-container">
+AAAAAAAA
   <iron-icon id="disabled-by-admin-icon" icon="cr20:domain"></iron-icon>
   <div class="flex cr-padded-text">
     $i18n{syncDisabledByAdministrator}
   </div>
 </div>
 
-BBBB
 </template>
 <script src="p2p_keys_subpage.js"></script>
 </dom-module>
