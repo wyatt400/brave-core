@@ -5,10 +5,15 @@
 
 #include "brave/ios/browser/api/bookmarks/brave_bookmarks_api.h"
 
+#include "base/bind.h"
+#include "base/callback_helpers.h"
 #include "base/compiler_specific.h"
 #include "base/containers/adapters.h"
 #include "base/guid.h"
+#include "base/sequenced_task_runner.h"
 #include "base/strings/sys_string_conversions.h"
+#include "base/task/post_task.h"
+#include "base/task/thread_pool.h"
 #include "brave/ios/browser/api/bookmarks/brave_bookmarks_observer.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/browser/bookmark_node.h"
@@ -24,6 +29,7 @@
 #include "ios/chrome/browser/browser_state/chrome_browser_state_manager.h"
 #include "ios/chrome/browser/ui/bookmarks/bookmark_utils_ios.h"
 #include "ios/chrome/browser/undo/bookmark_undo_service_factory.h"
+#include "ios/web/public/thread/web_task_traits.h"
 #include "ios/web/public/thread/web_thread.h"
 #import "net/base/mac/url_conversions.h"
 #include "url/gurl.h"
@@ -622,24 +628,57 @@
   bookmark_model_->RemoveAllUserBookmarks();
 }
 
-- (NSArray<IOSBookmarkNode*>*)searchWithQuery:(NSString*)query
-                                     maxCount:(NSUInteger)maxCount {
-  DCHECK_CURRENTLY_ON(web::WebThread::UI);
-  DCHECK(bookmark_model_->loaded());
-  bookmarks::QueryFields queryFields;
-  queryFields.word_phrase_query.reset(
-      new base::string16(base::SysNSStringToUTF16(query)));
-  std::vector<const bookmarks::BookmarkNode*> results;
-  GetBookmarksMatchingProperties(bookmark_model_, queryFields, maxCount,
-                                 &results);
+- (void)searchWithQuery:(NSString*)query
+               maxCount:(NSUInteger)maxCount
+             completion:(void(^)(NSArray<IOSBookmarkNode*>*))completion {
+//  DCHECK_CURRENTLY_ON(web::WebThread::UI);
+//  DCHECK(bookmark_model_->loaded());
+    
+  auto search_with_query = [](BraveBookmarksAPI* weak_bookmarks_api,
+                              NSString* query,
+                              NSUInteger maxCount,
+                              std::function<void(
+                                  NSArray<IOSBookmarkNode*>*)
+                              > completion) {
+    __strong BraveBookmarksAPI* bookmarks_api = weak_bookmarks_api;
+    if (!bookmarks_api) {
+      completion(@[]);
+      return;
+    }
+    
+    DCHECK(bookmarks_api->bookmark_model_->loaded());
+    
+    bookmarks::QueryFields queryFields;
+    queryFields.word_phrase_query.reset(
+        new base::string16(base::SysNSStringToUTF16(query)));
+    std::vector<const bookmarks::BookmarkNode*> results;
+    GetBookmarksMatchingProperties(bookmarks_api->bookmark_model_,
+                                   queryFields,
+                                   maxCount,
+                                   &results);
 
-  NSMutableArray<IOSBookmarkNode*>* nodes = [[NSMutableArray alloc] init];
-  for (const bookmarks::BookmarkNode* bookmark : results) {
-    IOSBookmarkNode* node =
-        [[IOSBookmarkNode alloc] initWithNode:bookmark model:bookmark_model_];
-    [nodes addObject:node];
-  }
-  return nodes;
+    NSMutableArray<IOSBookmarkNode*>* nodes =
+                                      [[NSMutableArray alloc] init];
+    for (const bookmarks::BookmarkNode* bookmark : results) {
+      IOSBookmarkNode* node =
+          [[IOSBookmarkNode alloc] initWithNode:bookmark
+                                    model:bookmarks_api->bookmark_model_];
+      [nodes addObject:node];
+    }
+    completion(nodes);
+  };
+    
+  __weak BraveBookmarksAPI* weakSelf = self;
+  base::PostTask(
+      FROM_HERE,
+//      {base::ThreadPool(), base::MayBlock(), base::TaskPriority::USER_VISIBLE,
+//       base::TaskShutdownBehavior::BLOCK_SHUTDOWN},
+        {web::WebThread::UI},
+      base::BindOnce(search_with_query,
+                     weakSelf,
+                     query,
+                     maxCount,
+                     completion));
 }
 
 - (void)undo {
