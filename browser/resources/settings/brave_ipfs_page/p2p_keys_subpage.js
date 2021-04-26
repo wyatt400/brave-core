@@ -25,23 +25,40 @@ Polymer({
   ],
 
   properties: {
-    /**
-    * Current page status
-    * 'configure' | 'setup' | 'spinner'
-    * @private
-    */
-    pageStatus_: {
-      type: String,
-      value: 'configure',
+    readOnlyList: {
+      type: Boolean,
+      value: false,
     },
-  },
 
+    /**
+     * Array of sites to display in the widget.
+     * @type {!Array<SiteException>}
+     */
+     keys: {
+      type: Array,
+      value() {
+        return [];
+      },
+    },
+    /** @private */
+    lastFocused_: Object,
+
+    /** @private */
+    listBlurred_: Boolean,
+
+    /** @private */
+    tooltipText_: String,
+  },
+  
+  activeDialogAnchor_: null,
   /** @private {?SyncBrowserProxy} */
+  
   browserProxy_: null,
 
   /** @override */
   created: function() {
     console.log("created");
+    keys = ["1", "2", "3", "4"]
     // this.browserProxy_ = SyncBrowserProxyImpl.getInstance();
   },
 
@@ -54,4 +71,23 @@ Polymer({
   attached: function() {
     console.log("attached");
   },
+
+  onAddKeyTap_: function() {
+    console.log("onAddKeyTap_");
+  },
+  /**
+   * @return {!Array<!SiteException>}
+   * @private
+   */
+   getKeysItems_() {
+    return this.keys.slice();
+   },
+
+   onShowActionMenu_(e) {
+    this.activeDialogAnchor_ = /** @type {!HTMLElement} */ (e.detail.anchor);
+    this.actionMenuSite_ = e.detail.model;
+    /** @type {!CrActionMenuElement} */ (this.$$('cr-action-menu'))
+        .showAt(this.activeDialogAnchor_);
+  },
+
 });

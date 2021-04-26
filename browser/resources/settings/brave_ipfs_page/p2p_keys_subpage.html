@@ -24,13 +24,35 @@
     padding: 8px 1em;
   }
 
+  .main-container {
+    height: 100%;
+    width: 100%;
+  }
 </style>
 
-<div class="settings-box flex-container">
-AAAAAAAA
-  <iron-icon id="disabled-by-admin-icon" icon="cr20:domain"></iron-icon>
-  <div class="flex cr-padded-text">
-    $i18n{syncDisabledByAdministrator}
+<div class="settings-box flex-container main-container">
+  <div id="category">
+    <div class="cr-row first">
+      <h2 class$="flex [[getCssClass_(enableContentSettingsRedesign_)]]">
+        $i18n{ipfsIpnsKeysLinkTitle}
+      </h2>
+      <cr-button id="addSite" class="header-aligned-button" on-click="onAddKeyTap_">
+        $i18n{add}
+      </cr-button>
+    </div>
+    <div class="list-frame menu-content vertical-list" id="listContainer">
+      <iron-list items="[[getKeysItems_()]]"
+          preserve-focus risk-selection>
+        <template>
+          <site-list-entry model="[[item]]" read-only-list="[[readOnlyList]]"
+              on-show-action-menu="onShowActionMenu_" tabindex$="[[tabIndex]]"
+              first$="[[!index]]" iron-list-tab-index="[[tabIndex]]"
+              last-focused="{{lastFocused_}}" list-blurred="{{listBlurred_}}"
+              focus-row-index="[[index]]">
+          </site-list-entry>
+        </template>
+      </iron-list>
+    </div>
   </div>
 </div>
 
