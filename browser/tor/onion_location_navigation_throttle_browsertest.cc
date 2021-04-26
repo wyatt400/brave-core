@@ -3,7 +3,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "base/run_loop.h"
 #include "base/strings/utf_string_conversions.h"
 #include "brave/browser/tor/tor_profile_service_factory.h"
 #include "brave/browser/ui/browser_commands.h"
@@ -13,9 +12,7 @@
 #include "brave/components/tor/pref_names.h"
 #include "brave/grit/brave_generated_resources.h"
 #include "chrome/browser/chrome_notification_types.h"
-#include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_list.h"
-#include "chrome/browser/ui/browser_list_observer.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -56,31 +53,6 @@ std::unique_ptr<net::test_server::HttpResponse> HandleOnionLocation(
   return std::move(http_response);
 }
 
-// An observer that returns back to test code after a new browser is added to
-// the BrowserList.
-class BrowserAddedObserver : public BrowserListObserver {
- public:
-  BrowserAddedObserver() { BrowserList::AddObserver(this); }
-
-  ~BrowserAddedObserver() override { BrowserList::RemoveObserver(this); }
-
-  Browser* Wait() {
-    run_loop_.Run();
-    return browser_;
-  }
-
- protected:
-  // BrowserListObserver:
-  void OnBrowserAdded(Browser* browser) override {
-    browser_ = browser;
-    run_loop_.Quit();
-  }
-
- private:
-  Browser* browser_;
-  base::RunLoop run_loop_;
-};
-
 }  // namespace
 
 class OnionLocationNavigationThrottleBrowserTest : public InProcessBrowserTest {
@@ -117,7 +89,6 @@ class OnionLocationNavigationThrottleBrowserTest : public InProcessBrowserTest {
     EXPECT_EQ(onion_button->GetText(),
               l10n_util::GetStringUTF16((IDS_LOCATION_BAR_OPEN_IN_TOR)));
 
-    BrowserAddedObserver tor_browser_creation_observer;
     ui::MouseEvent pressed(ui::ET_MOUSE_PRESSED, gfx::Point(), gfx::Point(),
                            ui::EventTimeForNow(), ui::EF_LEFT_MOUSE_BUTTON,
                            ui::EF_LEFT_MOUSE_BUTTON);
@@ -126,7 +97,7 @@ class OnionLocationNavigationThrottleBrowserTest : public InProcessBrowserTest {
                             ui::EF_LEFT_MOUSE_BUTTON);
     views::test::ButtonTestApi(onion_button).NotifyClick(pressed);
     views::test::ButtonTestApi(onion_button).NotifyClick(released);
-    tor_browser_creation_observer.Wait();
+    ui_test_utils::WaitForBrowserToOpen();
     BrowserList* browser_list = BrowserList::GetInstance();
     ASSERT_EQ(2U, browser_list->size());
     Browser* tor_browser = browser_list->get(1);
@@ -200,12 +171,11 @@ IN_PROC_BROWSER_TEST_F(OnionLocationNavigationThrottleBrowserTest,
   ASSERT_FALSE(browser_list->get(0)->profile()->IsTor());
   ASSERT_EQ(browser(), browser_list->get(0));
 
-  BrowserAddedObserver tor_browser_creation_observer;
   content::WebContents* web_contents =
       browser()->tab_strip_model()->GetActiveWebContents();
   content::TestNavigationObserver nav_observer(web_contents);
   ui_test_utils::NavigateToURL(browser(), GURL(kTestOnionURL));
-  tor_browser_creation_observer.Wait();
+  ui_test_utils::WaitForBrowserToOpen();
   nav_observer.Wait();
   // Original request was blocked
   EXPECT_EQ(nav_observer.last_net_error_code(), net::ERR_BLOCKED_BY_CLIENT);
@@ -239,11 +209,10 @@ IN_PROC_BROWSER_TEST_F(OnionLocationNavigationThrottleBrowserTest,
                        OnionLocationHeader_AutoOnionRedirect) {
   browser()->profile()->GetPrefs()->SetBoolean(tor::prefs::kAutoOnionRedirect,
                                                true);
-  BrowserAddedObserver tor_browser_creation_observer;
 
   GURL url = test_server()->GetURL("/onion");
   ui_test_utils::NavigateToURL(browser(), url);
-  tor_browser_creation_observer.Wait();
+  ui_test_utils::WaitForBrowserToOpen();
   // We don't close the original tab
   EXPECT_EQ(browser()->tab_strip_model()->count(), 1);
   content::WebContents* web_contents =

@@ -5,7 +5,6 @@
 
 #include <memory>
 
-#include "base/run_loop.h"
 #include "brave/browser/ui/brave_browser_command_controller.h"
 #include "brave/browser/ui/browser_commands.h"
 #include "brave/components/brave_rewards/browser/buildflags/buildflags.h"
@@ -16,11 +15,10 @@
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_window.h"
-#include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_list.h"
-#include "chrome/browser/ui/browser_list_observer.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/test/base/in_process_browser_test.h"
+#include "chrome/test/base/ui_test_utils.h"
 #include "content/public/browser/notification_service.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_utils.h"
@@ -34,35 +32,6 @@
 #endif
 
 using BraveBrowserCommandControllerTest = InProcessBrowserTest;
-
-namespace {
-
-// An observer that returns back to test code after a new browser is added to
-// the BrowserList.
-class BrowserAddedObserver : public BrowserListObserver {
- public:
-  BrowserAddedObserver() { BrowserList::AddObserver(this); }
-
-  ~BrowserAddedObserver() override { BrowserList::RemoveObserver(this); }
-
-  Browser* Wait() {
-    run_loop_.Run();
-    return browser_;
-  }
-
- protected:
-  // BrowserListObserver:
-  void OnBrowserAdded(Browser* browser) override {
-    browser_ = browser;
-    run_loop_.Quit();
-  }
-
- private:
-  Browser* browser_;
-  base::RunLoop run_loop_;
-};
-
-}  // namespace
 
 IN_PROC_BROWSER_TEST_F(BraveBrowserCommandControllerTest,
                        BraveCommandsEnableTest) {
@@ -142,10 +111,9 @@ IN_PROC_BROWSER_TEST_F(BraveBrowserCommandControllerTest,
   EXPECT_TRUE(
       command_controller->IsCommandEnabled(IDC_SHOW_BRAVE_WEBCOMPAT_REPORTER));
 
-  BrowserAddedObserver browser_creation_observer;
   profiles::SwitchToGuestProfile(ProfileManager::CreateCallback());
 
-  browser_creation_observer.Wait();
+  ui_test_utils::WaitForBrowserToOpen();
 
   auto* browser_list = BrowserList::GetInstance();
   Browser* guest_browser = nullptr;
@@ -184,9 +152,8 @@ IN_PROC_BROWSER_TEST_F(BraveBrowserCommandControllerTest,
       command_controller->IsCommandEnabled(IDC_SHOW_BRAVE_WEBCOMPAT_REPORTER));
 
 #if BUILDFLAG(ENABLE_TOR)
-  BrowserAddedObserver tor_browser_creation_observer;
   brave::NewOffTheRecordWindowTor(browser());
-  tor_browser_creation_observer.Wait();
+  ui_test_utils::WaitForBrowserToOpen();
   Browser* tor_browser = nullptr;
   for (Browser* browser : *browser_list) {
     if (browser->profile()->IsTor()) {

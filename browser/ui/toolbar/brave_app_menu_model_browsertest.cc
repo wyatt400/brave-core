@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/run_loop.h"
 #include "brave/browser/ui/brave_browser_command_controller.h"
 #include "brave/browser/ui/browser_commands.h"
 #include "brave/components/brave_rewards/browser/buildflags/buildflags.h"
@@ -19,12 +18,11 @@
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_window.h"
-#include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_list.h"
-#include "chrome/browser/ui/browser_list_observer.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/test/base/in_process_browser_test.h"
+#include "chrome/test/base/ui_test_utils.h"
 #include "content/public/browser/notification_service.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_utils.h"
@@ -34,33 +32,6 @@
 #endif
 
 using BraveAppMenuBrowserTest = InProcessBrowserTest;
-
-namespace {
-
-// An observer that returns back to test code after a new browser is added to
-// the BrowserList.
-class BrowserAddedObserver : public BrowserListObserver {
- public:
-  BrowserAddedObserver() { BrowserList::AddObserver(this); }
-
-  ~BrowserAddedObserver() override { BrowserList::RemoveObserver(this); }
-
-  Browser* Wait() {
-    run_loop_.Run();
-    return browser_;
-  }
-
- protected:
-  // BrowserListObserver:
-  void OnBrowserAdded(Browser* browser) override {
-    browser_ = browser;
-    run_loop_.Quit();
-  }
-
- private:
-  Browser* browser_;
-  base::RunLoop run_loop_;
-};
 
 void CheckCommandsAreDisabledInMenuModel(
     Browser* browser,
@@ -88,8 +59,6 @@ void CheckCommandsAreInOrderInMenuModel(
   EXPECT_TRUE(
       std::is_sorted(std::begin(commands_index), std::end(commands_index)));
 }
-
-}  // namespace
 
 // Test brave menu order test.
 // Brave menu is inserted based on corresponding commands enable status.
@@ -183,10 +152,9 @@ IN_PROC_BROWSER_TEST_F(BraveAppMenuBrowserTest, MenuOrderTest) {
   CheckCommandsAreDisabledInMenuModel(private_browser,
                                       commands_disabled_for_private_profile);
 
-  BrowserAddedObserver browser_creation_observer;
   profiles::SwitchToGuestProfile(ProfileManager::CreateCallback());
 
-  browser_creation_observer.Wait();
+  ui_test_utils::WaitForBrowserToOpen();
 
   auto* browser_list = BrowserList::GetInstance();
   Browser* guest_browser = nullptr;
@@ -227,9 +195,8 @@ IN_PROC_BROWSER_TEST_F(BraveAppMenuBrowserTest, MenuOrderTest) {
                                       commands_disabled_for_guest_profile);
 
 #if BUILDFLAG(ENABLE_TOR)
-  BrowserAddedObserver tor_browser_creation_observer;
   brave::NewOffTheRecordWindowTor(browser());
-  tor_browser_creation_observer.Wait();
+  ui_test_utils::WaitForBrowserToOpen();
   Browser* tor_browser = nullptr;
   for (Browser* browser : *browser_list) {
     if (browser->profile()->IsTor()) {

@@ -3,7 +3,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
 // you can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "base/run_loop.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/profiles/profile.h"
@@ -11,46 +10,18 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_window.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_finder.h"
 #include "chrome/browser/ui/browser_list.h"
-#include "chrome/browser/ui/browser_list_observer.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/frame/toolbar_button_provider.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/search_test_utils.h"
+#include "chrome/test/base/ui_test_utils.h"
 #include "content/public/browser/notification_service.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_utils.h"
 #include "ui/views/view.h"
-
-namespace {
-
-// An observer that returns back to test code after a new browser is added to
-// the BrowserList.
-class BrowserAddedObserver : public BrowserListObserver {
- public:
-  BrowserAddedObserver() { BrowserList::AddObserver(this); }
-
-  ~BrowserAddedObserver() override { BrowserList::RemoveObserver(this); }
-
-  Browser* Wait() {
-    run_loop_.Run();
-    return browser_;
-  }
-
- protected:
-  // BrowserListObserver:
-  void OnBrowserAdded(Browser* browser) override {
-    browser_ = browser;
-    run_loop_.Quit();
-  }
-
- private:
-  Browser* browser_;
-  base::RunLoop run_loop_;
-};
 
 // An observer that returns back to test code after a new profile is
 // initialized.
@@ -60,8 +31,6 @@ void OnUnblockOnProfileCreation(base::RunLoop* run_loop,
   if (status == Profile::CREATE_STATUS_INITIALIZED)
     run_loop->Quit();
 }
-
-}  // namespace
 
 class BraveToolbarViewTest : public InProcessBrowserTest {
  public:
@@ -98,10 +67,9 @@ IN_PROC_BROWSER_TEST_F(BraveToolbarViewTest,
 IN_PROC_BROWSER_TEST_F(BraveToolbarViewTest, AvatarButtonIsShownGuestProfile) {
   // Open a Guest window.
   EXPECT_EQ(1U, BrowserList::GetInstance()->size());
-  BrowserAddedObserver browser_creation_observer;
   profiles::SwitchToGuestProfile(ProfileManager::CreateCallback());
   base::RunLoop().RunUntilIdle();
-  browser_creation_observer.Wait();
+  ui_test_utils::WaitForBrowserToOpen();
   EXPECT_EQ(2U, BrowserList::GetInstance()->size());
 
   // Retrieve the new Guest profile.
@@ -138,12 +106,11 @@ IN_PROC_BROWSER_TEST_F(BraveToolbarViewTest,
 
   // Open the new profile
   EXPECT_EQ(1U, BrowserList::GetInstance()->size());
-  BrowserAddedObserver browser_creation_observer;
   profiles::OpenBrowserWindowForProfile(ProfileManager::CreateCallback(), false,
                                         true, true, new_profile,
                                         Profile::CREATE_STATUS_INITIALIZED);
   base::RunLoop().RunUntilIdle();
-  browser_creation_observer.Wait();
+  ui_test_utils::WaitForBrowserToOpen();
   EXPECT_EQ(2U, BrowserList::GetInstance()->size());
 
   // Check it's shown in second profile
